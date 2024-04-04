@@ -1,8 +1,17 @@
-import app from "./app";
+import 'dotenv/config';
+import mongoose from 'mongoose';
+import app from './app';
 
 const port = process.env.PORT || 3000;
-const server = app.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
-});
 
-export default server;
+(async () => {
+  try {
+    await mongoose.connect(process.env.MONGODB_URI as string);
+    console.log('Connected to MongoDB Successfully');
+    app.listen(port, () => {
+      console.log('Listening on port ' + process.env.PORT);
+    });
+  } catch (error) {
+    console.log(error);
+  }
+})();

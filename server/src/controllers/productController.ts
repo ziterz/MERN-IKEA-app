@@ -1,83 +1,86 @@
 import { Request, Response } from 'express';
-import { ObjectId } from 'mongodb';
-import db from '../config/mongodb';
+import { Product } from '../models/Product.model';
 
-interface Product {
-  name: string;
-  description: string;
-  price: number;
-  images: string[];
-}
-
-export const postProduct = async (req: Request, res: Response) => {  
+export const postProduct = async (req: Request, res: Response) => {
   try {
-    const { name, description, price, images }: Product = req.body;
-    const product = { name, description, price, images };
-    const result = await db.collection('products').insertOne(product);
+    const { name, description, price, stock, images } = req.body;
+    const product = await Product.create({
+      name,
+      description,
+      price,
+      stock,
+      images,
+    });
 
-    if (!result.acknowledged) {
-      return res.status(500).json({message: 'Failed to create product'});
-    }
-  
-    res.status(201).json({message: 'Product created', product});
+    res.status(201).json({
+      message: 'Product created successfully',
+      product,
+    });
   } catch (error) {
-    res.status(500).json({message: 'Failed to create product'});
+    console.log(error);
+    res.status(500).json({ message: 'Internal server error' });
   }
-}
+};
 
 export const getProducts = async (req: Request, res: Response) => {
   try {
-    const products = await db.collection('products').find().toArray();
+    const products = await Product.find();
 
-    res.status(200).json(products);
+    res.status(200).json({ products });
   } catch (error) {
-    res.status(500).json({message: 'Failed to fetch products'});
+    console.log(error);
+    res.status(500).json({ message: 'Internal server error' });
   }
-}
+};
 
 export const getProductById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const product = await db.collection('products').findOne({ _id: new ObjectId(id.trim()) });
-  
+    const product = await Product.findById(id);
+
     if (!product) {
-      return res.status(404).json({message: 'Product not found'});
+      return res.status(404).json({ message: 'Product not found' });
     }
-  
+
     res.status(200).json(product);
   } catch (error) {
-    res.status(500).json({message: 'Failed to fetch product'});
+    console.log(error);
+    res.status(500).json({ message: 'Internal server error' });
   }
-}
+};
 
 export const updateProduct = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const { name, description, price, images }: Product = req.body;
-    const product = { name, description, price, images };
-    const result = await db.collection('products').updateOne({ _id: new ObjectId(id.trim()) }, { $set: product });
-  
-    if (!result.acknowledged) {
-      return res.status(500).json({message: 'Failed to update product'});
-    }
-  
-    res.status(200).json({message: 'Product updated', product});
+    const { name, description, price, stock, images } = req.body;
+    const product = await Product.findByIdAndUpdate(
+      id,
+      { name, description, price, stock, images },
+      { new: true }
+    );
+
+    res.status(200).json({ message: 'Product updated', product });
   } catch (error) {
-    res.status(500).json({message: 'Failed to update product'});
+    console.log(error);
+    res.status(500).json({ message: 'Internal server error' });
   }
-}
+};
 
 export const deleteProduct = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const result = await db.collection('products').deleteOne({ _id: new ObjectId(id.trim()) });
-  
-    if (!result.acknowledged) {
-      return res.status(500).json({message: 'Failed to delete product'});
+    const product = await Product.findByIdAndDelete(id);
+
+    if (!product) {
+      throw { name: 'NotFound', message: `Product with id ${id} not found` };
     }
-  
-    res.status(200).json({message: 'Product deleted'});
-  } catch (error) {
-    res.status(500).json({message: 'Failed to delete product'});
+
+    res.status(200).json({ message: `Product with id ${id} deleted`, product });
+  } catch (error: any) {
+    console.log(error);
+    if (error.name === 'NotFound') {
+      return res.status(404).json({ message: error.message });
+    }
+    res.status(500).json({ message: 'Internal server error' });
   }
-}
+};
