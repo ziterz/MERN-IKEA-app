@@ -7,6 +7,7 @@ const ProductSchema = new Schema<IProduct>({
   price: { type: Number, required: true },
   stock: { type: Number, required: true },
   images: { type: [String], required: true },
+  category: { type: Schema.Types.ObjectId, required: true, ref: 'Category' },
 });
 
 export const Product = model<IProduct>('Product', ProductSchema);

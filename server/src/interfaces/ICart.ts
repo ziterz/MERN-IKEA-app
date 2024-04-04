@@ -1,7 +1,7 @@
 import { IProduct } from './IProduct';
 import { IUser } from './IUser';
 
-export interface ICategory {
+export interface ICart {
   user: IUser;
   items: [
     {
