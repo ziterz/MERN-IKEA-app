@@ -1,6 +1,10 @@
 import express, { Application, json } from 'express';
 import cors from 'cors';
-import router from './routes/router';
+import user from './routes/user';
+import category from './routes/category';
+import product from './routes/product';
+import cart from './routes/cart';
+import order from './routes/order';
 
 const app: Application = express();
 
@@ -13,6 +17,10 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 app.use(json());
-app.use('/products', router);
+app.use('/api/', user);
+app.use('/api/categories', category);
+app.use('/api/products', product);
+app.use('/api/carts', cart);
+app.use('/api/orders', order);
 
 export default app;

@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { Product } from '../models/Product.model';
 
-export const postProduct = async (req: Request, res: Response) => {
+export const addProduct = async (req: Request, res: Response) => {
   try {
     const { name, description, price, stock, images } = req.body;
     const product = await Product.create({
@@ -39,12 +39,15 @@ export const getProductById = async (req: Request, res: Response) => {
     const product = await Product.findById(id);
 
     if (!product) {
-      return res.status(404).json({ message: 'Product not found' });
+      throw { name: 'NotFound', message: 'Product not found' };
     }
 
     res.status(200).json(product);
-  } catch (error) {
+  } catch (error: any) {
     console.log(error);
+    if (error.name === 'NotFound') {
+      return res.status(404).json({ message: error.message });
+    }
     res.status(500).json({ message: 'Internal server error' });
   }
 };
@@ -59,6 +62,10 @@ export const updateProduct = async (req: Request, res: Response) => {
       { new: true }
     );
 
+    if (!product) {
+      throw { name: 'NotFound', message: 'Product not found' };
+    }
+
     res.status(200).json({ message: 'Product updated', product });
   } catch (error) {
     console.log(error);
@@ -72,7 +79,7 @@ export const deleteProduct = async (req: Request, res: Response) => {
     const product = await Product.findByIdAndDelete(id);
 
     if (!product) {
-      throw { name: 'NotFound', message: `Product with id ${id} not found` };
+      throw { name: 'NotFound', message: 'Product not found' };
     }
 
     res.status(200).json({ message: `Product with id ${id} deleted`, product });
