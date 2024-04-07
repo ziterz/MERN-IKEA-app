@@ -1,7 +1,11 @@
-import { Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { Category } from '../models/Category.model';
 
-export const addCategory = async (req: Request, res: Response) => {
+export const addCategory = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const { name, image } = req.body;
     const category = await Category.create({
@@ -13,24 +17,30 @@ export const addCategory = async (req: Request, res: Response) => {
       message: 'Category created successfully',
       category,
     });
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: 'Internal server error' });
+  } catch (err: any) {
+    next(err);
   }
 };
 
-export const getCategories = async (req: Request, res: Response) => {
+export const getCategories = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const categories = await Category.find();
 
     res.status(200).json({ categories });
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: 'Internal server error' });
+  } catch (err) {
+    next(err);
   }
 };
 
-export const getCategoryById = async (req: Request, res: Response) => {
+export const getCategoryById = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const { id } = req.params;
     const category = await Category.findById(id);
@@ -40,16 +50,16 @@ export const getCategoryById = async (req: Request, res: Response) => {
     }
 
     res.status(200).json(category);
-  } catch (error: any) {
-    console.log(error);
-    if (error.name === 'NotFound') {
-      return res.status(404).json({ message: error.message });
-    }
-    res.status(500).json({ message: 'Internal server error' });
+  } catch (err: any) {
+    next(err);
   }
 };
 
-export const updateCategory = async (req: Request, res: Response) => {
+export const updateCategory = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const { id } = req.params;
     const { name, image } = req.body;
@@ -67,16 +77,16 @@ export const updateCategory = async (req: Request, res: Response) => {
       message: 'Category updated successfully',
       category,
     });
-  } catch (error: any) {
-    console.log(error);
-    if (error.name === 'NotFound') {
-      return res.status(404).json({ message: error.message });
-    }
-    res.status(500).json({ message: 'Internal server error' });
+  } catch (err: any) {
+    next(err);
   }
 };
 
-export const deleteCategory = async (req: Request, res: Response) => {
+export const deleteCategory = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const { id } = req.params;
     const category = await Category.findByIdAndDelete(id);
@@ -86,11 +96,7 @@ export const deleteCategory = async (req: Request, res: Response) => {
     }
 
     res.status(200).json({ message: 'Category deleted successfully' });
-  } catch (error: any) {
-    console.log(error);
-    if (error.name === 'NotFound') {
-      return res.status(404).json({ message: error.message });
-    }
-    res.status(500).json({ message: 'Internal server error' });
+  } catch (err: any) {
+    next(err);
   }
 };

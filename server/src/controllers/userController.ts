@@ -1,12 +1,22 @@
-import { Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
+import { comparePassword } from '../helpers/bcrypt';
+import { generateToken } from '../helpers/jwt';
 import { User } from '../models/User.model';
 
-export const register = async (req: Request, res: Response) => {
+export const register = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
-    let findUser = await User.findOne({ email: req.body.email });
+    const findUser = await User.findOne({ email: req.body.email });
 
     if (findUser) {
       throw { name: 'BadRequest', message: 'User already exists' };
+    }
+
+    if (req.body.password !== req.body.confirmPassword) {
+      throw { name: 'BadRequest', message: 'Passwords do not match' };
     }
 
     const user = await User.create(req.body);
@@ -14,21 +24,48 @@ export const register = async (req: Request, res: Response) => {
     res.status(201).json({
       message: 'User created successfully',
       user: {
-        _id: user._id,
         firstName: user.firstName,
         lastName: user.lastName,
-        email: user.email,
         address: user.address,
+        postalCode: user.postalCode,
         phoneNumber: user.phoneNumber,
+        email: user.email,
+        role: user.role,
       },
     });
-  } catch (error: any) {
-    console.log(error);
-    if (error.name === 'BadRequest') {
-      return res.status(400).json({ message: error.message });
-    }
-    res.status(500).json({ message: 'Internal server error' });
+  } catch (err: any) {
+    next(err);
   }
 };
 
-export const login = async (req: Request, res: Response) => {};
+export const login = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { email, password } = req.body;
+
+    const user = await User.findOne({ email: email });
+
+    if (!user) {
+      throw { name: 'BadRequest', message: 'Invalid credentials' };
+    }
+
+    const isPasswordMatch = await comparePassword(password, user.password);
+
+    if (!isPasswordMatch) {
+      throw { name: 'BadRequest', message: 'Invalid credentials' };
+    }
+
+    const token = generateToken({ userId: user._id });
+
+    res.cookie('auth_token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+    });
+    res.status(200).json({ message: 'Login successful' });
+  } catch (err: any) {
+    next(err);
+  }
+};

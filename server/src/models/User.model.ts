@@ -1,5 +1,5 @@
 import { Schema, model } from 'mongoose';
-import bcrypt from 'bcrypt';
+import { hashPassword } from '../helpers/bcrypt';
 import { IUser } from '../interfaces/IUser';
 
 const UserSchema = new Schema<IUser>({
@@ -9,12 +9,14 @@ const UserSchema = new Schema<IUser>({
   postalCode: { type: Number, required: true },
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
+  role: { type: String, required: true, default: 'user' },
   phoneNumber: { type: String, required: true },
 });
 
 UserSchema.pre<IUser>('save', async function (next) {
+  this.role = 'user';
   if (this.isModified('password')) {
-    this.password = await bcrypt.hash(this.password, 10);
+    this.password = await hashPassword(this.password);
   }
 
   return next();
