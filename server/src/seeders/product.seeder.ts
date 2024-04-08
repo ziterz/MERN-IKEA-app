@@ -70,15 +70,48 @@ export const productSeeder = async () => {
 
   const products = [
     {
-      name: 'SKOGSTA',
-      description: 'Dining table, 92 1/2x39 3/8 "',
-      price: 3000000,
-      stock: 5,
+      name: 'MALM',
+      description: 'Bed frame, Queen',
+      price: 3500000,
+      stock: 70,
       images: [
-        'https://www.ikea.com/us/en/images/products/skogsta-dining-table-acacia__0546603_pe656255_s5.jpg?f=xxs',
-        'https://www.ikea.com/us/en/images/products/skogsta-dining-table-acacia__1342684_pe949087_s5.jpg?f=xxs',
+        'https://www.ikea.com/us/en/images/products/malm-bed-frame-black-brown-luroey__0638608_pe699032_s5.jpg?f=xxs',
+        'https://www.ikea.com/us/en/images/products/malm-bed-frame-black-brown-luroey__1101514_pe866693_s5.jpg?f=xxs',
       ],
       category: category[0],
+    },
+    {
+      name: 'KLIPPAN',
+      description: 'Loveseat',
+      price: 4000000,
+      stock: 40,
+      images: [
+        'https://www.ikea.com/us/en/images/products/klippan-loveseat-bomstad-black__0562963_pe663653_s5.jpg?f=xxs',
+        'https://www.ikea.com/us/en/images/products/klippan-loveseat-bomstad-black__0827136_pe709127_s5.jpg?f=xxs',
+      ],
+      category: category[0],
+    },
+    {
+      name: 'DRÖNA',
+      description: 'Box, 13x15x13 "',
+      price: 60000,
+      stock: 120,
+      images: [
+        'https://www.ikea.com/us/en/images/products/droena-box-black__0713065_pe729169_s5.jpg?f=xxs',
+        'https://www.ikea.com/us/en/images/products/droena-box-black__1249495_pe923368_s5.jpg?f=xxs',
+      ],
+      category: category[1],
+    },
+    {
+      name: 'TJUSIG',
+      description: 'Shoe rack, 31 1/8x12 5/8x14 5/8 "',
+      price: 350000,
+      stock: 90,
+      images: [
+        'https://www.ikea.com/us/en/images/products/tjusig-shoe-rack-black__0710715_pe727750_s5.jpg?f=xxs',
+        'https://www.ikea.com/us/en/images/products/tjusig-shoe-rack-black__0391727_pe559948_s5.jpg?f=xxs',
+      ],
+      category: category[1],
     },
   ];
 
