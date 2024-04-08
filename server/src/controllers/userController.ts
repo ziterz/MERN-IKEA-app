@@ -58,13 +58,24 @@ export const login = async (
       throw { name: 'BadRequest', message: 'Invalid credentials' };
     }
 
-    const token = generateToken({ userId: user._id });
+    const token = generateToken({ userId: user._id.toString() });
 
     res.cookie('auth_token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
     });
-    res.status(200).json({ message: 'Login successful' });
+    res.status(200).json({
+      message: 'Login successful',
+      user: {
+        firstName: user.firstName,
+        lastName: user.lastName,
+        address: user.address,
+        postalCode: user.postalCode,
+        phoneNumber: user.phoneNumber,
+        email: user.email,
+        role: user.role,
+      },
+    });
   } catch (err: any) {
     next(err);
   }

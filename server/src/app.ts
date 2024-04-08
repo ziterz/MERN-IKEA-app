@@ -1,4 +1,5 @@
 import express, { Application, json, urlencoded } from 'express';
+import mongoose from 'mongoose';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import user from './routes/user';
@@ -16,6 +17,13 @@ const corsOptions = {
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
   credentials: true,
 };
+
+const connect = async () => {
+  await mongoose.connect(process.env.MONGODB_URI as string);
+  console.log('Connected to MongoDB Successfully');
+};
+
+connect().catch((err) => console.log(err));
 
 app.use(cors(corsOptions));
 app.use(cookieParser());

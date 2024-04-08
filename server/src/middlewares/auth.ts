@@ -35,3 +35,39 @@ export const authentication = async (
     next(err);
   }
 };
+
+export const authorization = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const user = await User.findById(req.userId);
+
+    if (!user || user.role !== 'user') {
+      throw { name: 'Forbidden' };
+    }
+
+    next();
+  } catch (err: any) {
+    next(err);
+  }
+};
+
+export const adminOnly = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const user = await User.findById(req.userId);
+
+    if (!user || user.role !== 'admin') {
+      throw { name: 'Forbidden' };
+    }
+
+    next();
+  } catch (err: any) {
+    next(err);
+  }
+};

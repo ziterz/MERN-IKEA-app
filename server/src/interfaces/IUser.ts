@@ -1,12 +1,10 @@
-import { Document } from 'mongoose';
-
-export interface IUser extends Document {
+export interface IUser {
   firstName: string;
   lastName: string;
   address: string;
-  postalCode: number;
+  postalCode: string;
   phoneNumber: string;
   email: string;
   password: string;
-  role: string | 'user' | 'admin';
+  role: string | 'user';
 }

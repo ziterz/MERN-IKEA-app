@@ -1,9 +1,7 @@
-import { Document } from 'mongoose';
 import { IProduct } from './IProduct';
-import { IUser } from './IUser';
 
-export interface ICart extends Document {
-  user: IUser;
+export interface ICart {
+  user: string; // User._id
   items: [
     {
       product: IProduct;
