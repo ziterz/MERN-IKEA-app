@@ -1,4 +1,5 @@
 import { User } from '../models/User.model';
+import { hashPassword } from '../helpers/bcrypt';
 
 export const userSeeder = async () => {
   const user = [
@@ -9,7 +10,7 @@ export const userSeeder = async () => {
       postalCode: '10250',
       phoneNumber: '081234567890',
       email: 'admin@mail.com',
-      password: 'admin123',
+      password: await hashPassword('admin123'),
       role: 'admin',
     },
     {
@@ -19,7 +20,7 @@ export const userSeeder = async () => {
       postalCode: '10250',
       phoneNumber: '081234567890',
       email: 'user@mail.com',
-      password: 'user123',
+      password: await hashPassword('user123'),
       role: 'user',
     },
   ];
