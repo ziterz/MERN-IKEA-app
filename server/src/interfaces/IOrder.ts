@@ -1,7 +1,8 @@
 import { Types } from 'mongoose';
 import { IProduct } from './IProduct';
 
-export interface ICart {
+export interface IOrder {
+  _id: Types.ObjectId;
   user: Types.ObjectId;
   items: [
     {
@@ -9,4 +10,7 @@ export interface ICart {
       quantity: number;
     }
   ];
+  totalPrice: number;
+  status: string;
+  createdAt: Date;
 }
