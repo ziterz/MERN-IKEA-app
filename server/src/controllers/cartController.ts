@@ -1,10 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
-import { Types } from 'mongoose';
 import { Product } from '../models/Product.model';
 import { Cart } from '../models/Cart.model';
 import { User } from '../models/User.model';
 import { IProduct } from '../interfaces/IProduct';
 import { ICart } from '../interfaces/ICart';
+import { Order } from '../models/Order.model';
 
 export const addToCart = async (
   req: Request,
@@ -29,7 +29,6 @@ export const addToCart = async (
     }
 
     const cart: ICart | null = await Cart.findOne({ user: req.userId });
-    console.log(cart);
 
     if (!cart) {
       await Cart.create({
@@ -183,6 +182,13 @@ export const checkout = async (
       const product = products[i];
 
       if (product.stock < cart.items[i].quantity) {
+        await Cart.updateOne(
+          { user: req.userId },
+          {
+            $pull: { items: { product: product._id } },
+          }
+        );
+
         throw {
           name: 'BadRequest',
           message: 'Product is out of stock',
@@ -197,9 +203,16 @@ export const checkout = async (
       );
     }
 
-    let total = 0;
-    cart.items.forEach((item) => {
-      total += item.product.price * item.quantity;
+    const total = cart.items.reduce((acc, item) => {
+      return acc + item.product.price * item.quantity;
+    }, 0);
+
+    await Order.create({
+      user: req.userId,
+      items: cart.items,
+      totalPrice: total,
+      status: 'pending',
+      createdAt: new Date(),
     });
 
     await Cart.deleteOne({ user: req.userId });
@@ -208,7 +221,7 @@ export const checkout = async (
     session.endSession();
 
     return res.status(200).json({
-      message: `Checkout successful with price Rp${total}`,
+      message: `Checkout successful, please do payment with Rp${total}`,
     });
   } catch (err: any) {
     await session.abortTransaction();
