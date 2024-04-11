@@ -28,7 +28,7 @@ export const addToCart = async (
       throw { name: 'BadRequest', message: 'Product is out of stock' };
     }
 
-    const cart = await Cart.findOne({ user: req.userId });
+    const cart: ICart | null = await Cart.findOne({ user: req.userId });
     console.log(cart);
 
     if (!cart) {
@@ -37,18 +37,27 @@ export const addToCart = async (
         items: [{ product, quantity }],
       });
     } else {
-      await Cart.findOneAndUpdate(
-        {
-          user: req.userId,
-          items: { $elemMatch: { product: productId } },
-        },
-        {
-          $inc: { 'items.$.quantity': quantity },
-        }
-      );
+      if (cart.items.some((item) => item.product == productId)) {
+        await Cart.updateOne(
+          {
+            user: req.userId,
+            'items.product': productId,
+          },
+          {
+            $inc: { 'items.$.quantity': quantity },
+          }
+        );
+      } else {
+        await Cart.updateOne(
+          { user: req.userId },
+          {
+            $push: { items: { product, quantity } },
+          }
+        );
+      }
     }
 
-    return res.status(201).json({
+    return res.status(200).json({
       message: 'Product added to cart successfully',
     });
   } catch (err: any) {
@@ -60,22 +69,151 @@ export const getCart = async (
   req: Request,
   res: Response,
   next: NextFunction
-) => {};
+) => {
+  try {
+    const cart: ICart | null = await Cart.findOne({
+      user: req.userId,
+    }).populate('items.product');
+
+    if (!cart) {
+      throw { name: 'NotFound', message: 'Cart not found' };
+    }
+
+    return res.status(200).json(cart);
+  } catch (err: any) {
+    next(err);
+  }
+};
 
 export const updateCart = async (
   req: Request,
   res: Response,
   next: NextFunction
-) => {};
+) => {
+  try {
+    const { productId, quantity } = req.body;
+
+    const product: IProduct | null = await Product.findById(productId);
+
+    if (!product) {
+      throw { name: 'NotFound', message: 'Product not found' };
+    }
+
+    const cart: ICart | null = await Cart.findOne({ user: req.userId });
+
+    if (!cart) {
+      throw { name: 'NotFound', message: 'Cart not found' };
+    }
+
+    if (quantity <= 0) {
+      await Cart.updateOne(
+        { user: req.userId },
+        {
+          $pull: { items: { product: productId } },
+        }
+      );
+    } else {
+      await Cart.updateOne(
+        {
+          user: req.userId,
+          'items.product': productId,
+        },
+        {
+          $set: { 'items.$.quantity': quantity },
+        }
+      );
+    }
+
+    return res.status(200).json({
+      message: 'Cart updated successfully',
+    });
+  } catch (err: any) {
+    next(err);
+  }
+};
 
 export const deleteCart = async (
   req: Request,
   res: Response,
   next: NextFunction
-) => {};
+) => {
+  try {
+    const cart: ICart | null = await Cart.findOne({ user: req.userId });
+
+    if (!cart) {
+      throw { name: 'NotFound', message: 'Cart not found' };
+    }
+
+    await Cart.deleteOne({ user: req.userId });
+
+    return res.status(200).json({
+      message: 'Cart deleted successfully',
+    });
+  } catch (err: any) {
+    next(err);
+  }
+};
 
 export const checkout = async (
   req: Request,
   res: Response,
   next: NextFunction
-) => {};
+) => {
+  const session = await Cart.startSession();
+  session.startTransaction();
+
+  try {
+    const user: any = await User.findById(req.userId);
+
+    if (!user) {
+      throw { name: 'NotFound', message: 'User not found' };
+    }
+
+    const cart: ICart | null = await Cart.findOne({
+      user: req.userId,
+    }).populate('items.product');
+
+    if (!cart) {
+      throw { name: 'NotFound', message: 'Cart not found' };
+    }
+
+    const products = cart.items.map((item) => item.product);
+
+    for (let i = 0; i < products.length; i++) {
+      const product = products[i];
+
+      if (product.stock < cart.items[i].quantity) {
+        throw {
+          name: 'BadRequest',
+          message: 'Product is out of stock',
+        };
+      }
+
+      await Product.updateOne(
+        { _id: product._id },
+        {
+          $inc: { stock: -cart.items[i].quantity },
+        }
+      );
+    }
+
+    let total = 0;
+    cart.items.forEach((item) => {
+      total += item.product.price * item.quantity;
+    });
+
+    await Cart.deleteOne({ user: req.userId });
+
+    await session.commitTransaction();
+    session.endSession();
+
+    return res.status(200).json({
+      message: `Checkout successful with price Rp${total}`,
+    });
+  } catch (err: any) {
+    await session.abortTransaction();
+    session.endSession();
+
+    next(err);
+  }
+};
