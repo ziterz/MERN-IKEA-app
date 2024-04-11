@@ -1,7 +1,8 @@
+import { Types } from 'mongoose';
 import { IProduct } from './IProduct';
 
 export interface ICart {
-  user: string; // User._id
+  user: Types.ObjectId;
   items: [
     {
       product: IProduct;

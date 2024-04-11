@@ -2,6 +2,9 @@ import { Request, Response, NextFunction } from 'express';
 import { Types } from 'mongoose';
 import { Product } from '../models/Product.model';
 import { Cart } from '../models/Cart.model';
+import { User } from '../models/User.model';
+import { IProduct } from '../interfaces/IProduct';
+import { ICart } from '../interfaces/ICart';
 
 export const addToCart = async (
   req: Request,
@@ -10,34 +13,39 @@ export const addToCart = async (
 ) => {
   try {
     const { productId, quantity } = req.body;
-    const userId = req.userId;
 
-    const product = await Product.findById(productId);
+    const product: IProduct | null = await Product.findById(productId);
 
     if (!product) {
       throw { name: 'NotFound', message: 'Product not found' };
     }
 
-    const stock = await Product.findById(productId).where('stock').gt(0);
+    const checkStock: IProduct | null = await Product.findById(productId)
+      .where('stock')
+      .gt(0);
 
-    if (!stock) {
+    if (!checkStock) {
       throw { name: 'BadRequest', message: 'Product is out of stock' };
     }
 
-    const cart = await Cart.findOne({ user: userId });
+    const cart = await Cart.findOne({ user: req.userId });
+    console.log(cart);
 
     if (!cart) {
       await Cart.create({
-        user: userId,
+        user: req.userId,
         items: [{ product, quantity }],
       });
     } else {
-      const productInCart = await Cart.findOne({ user: userId })
-        .where('items')
-        .where('product')
-        .equals(productId);
-
-      console.log(productInCart);
+      await Cart.findOneAndUpdate(
+        {
+          user: req.userId,
+          items: { $elemMatch: { product: productId } },
+        },
+        {
+          $inc: { 'items.$.quantity': quantity },
+        }
+      );
     }
 
     return res.status(201).json({

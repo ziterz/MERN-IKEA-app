@@ -3,14 +3,14 @@ import { ICart } from '../interfaces/ICart';
 
 const CartSchema = new Schema<ICart>({
   user: {
-    type: String, // User._id
+    type: Schema.Types.ObjectId,
     required: true,
     ref: 'User',
   },
   items: [
     {
       product: {
-        type: String, // Product._id
+        type: Schema.Types.ObjectId,
         required: true,
         ref: 'Product',
       },

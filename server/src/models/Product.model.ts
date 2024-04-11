@@ -8,7 +8,7 @@ const ProductSchema = new Schema<IProduct>({
   stock: { type: Number, required: true, min: 0 },
   images: { type: [String], required: true },
   category: {
-    type: String, // Category._id
+    type: Schema.Types.ObjectId,
     required: true,
     ref: 'Category',
   },
