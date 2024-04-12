@@ -7,14 +7,15 @@ export const addProduct = async (
   next: NextFunction
 ) => {
   try {
-    const { name, description, price, stock, images } = req.body;
+    const { name, description, price, stock, images, category } = req.body;
     const product = await Product.create({
       name,
       description,
       price,
       stock,
       images,
-    });
+      category,
+    }).then((product) => product.populate('category'));
 
     res.status(201).json({
       message: 'Product created successfully',
@@ -31,7 +32,7 @@ export const getProducts = async (
   next: NextFunction
 ) => {
   try {
-    const products = await Product.find();
+    const products = await Product.find().populate('category');
 
     res.status(200).json({ products });
   } catch (err: any) {
@@ -46,7 +47,7 @@ export const getProductById = async (
 ) => {
   try {
     const { id } = req.params;
-    const product = await Product.findById(id);
+    const product = await Product.findById(id).populate('category');
 
     if (!product) {
       throw { name: 'NotFound', message: 'Product not found' };
@@ -70,7 +71,7 @@ export const updateProduct = async (
       id,
       { name, description, price, stock, images },
       { new: true }
-    );
+    ).populate('category');
 
     if (!product) {
       throw { name: 'NotFound', message: 'Product not found' };
