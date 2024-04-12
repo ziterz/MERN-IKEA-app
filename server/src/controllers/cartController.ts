@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from 'express';
+import { RequestHandler, Request, Response, NextFunction } from 'express';
 import { Product } from '../models/Product.model';
 import { Cart } from '../models/Cart.model';
 import { User } from '../models/User.model';
@@ -6,7 +6,7 @@ import { IProduct } from '../interfaces/IProduct';
 import { ICart } from '../interfaces/ICart';
 import { Order } from '../models/Order.model';
 
-export const addToCart = async (
+export const addToCart: RequestHandler = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -64,7 +64,7 @@ export const addToCart = async (
   }
 };
 
-export const getCart = async (
+export const getCart: RequestHandler = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -84,7 +84,7 @@ export const getCart = async (
   }
 };
 
-export const updateCart = async (
+export const updateCart: RequestHandler = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -131,7 +131,7 @@ export const updateCart = async (
   }
 };
 
-export const deleteCart = async (
+export const deleteCart: RequestHandler = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -153,7 +153,7 @@ export const deleteCart = async (
   }
 };
 
-export const checkout = async (
+export const checkout: RequestHandler = async (
   req: Request,
   res: Response,
   next: NextFunction

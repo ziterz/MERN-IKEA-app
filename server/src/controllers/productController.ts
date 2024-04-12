@@ -1,7 +1,7 @@
-import { Request, Response, NextFunction } from 'express';
+import { RequestHandler, Request, Response, NextFunction } from 'express';
 import { Product } from '../models/Product.model';
 
-export const addProduct = async (
+export const addProduct: RequestHandler = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -26,7 +26,7 @@ export const addProduct = async (
   }
 };
 
-export const getProducts = async (
+export const getProducts: RequestHandler = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -40,7 +40,7 @@ export const getProducts = async (
   }
 };
 
-export const getProductById = async (
+export const getProductById: RequestHandler = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -59,7 +59,7 @@ export const getProductById = async (
   }
 };
 
-export const updateProduct = async (
+export const updateProduct: RequestHandler = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -83,7 +83,7 @@ export const updateProduct = async (
   }
 };
 
-export const deleteProduct = async (
+export const deleteProduct: RequestHandler = async (
   req: Request,
   res: Response,
   next: NextFunction

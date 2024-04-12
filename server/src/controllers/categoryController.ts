@@ -1,7 +1,7 @@
-import { Request, Response, NextFunction } from 'express';
+import { RequestHandler, Request, Response, NextFunction } from 'express';
 import { Category } from '../models/Category.model';
 
-export const addCategory = async (
+export const addCategory: RequestHandler = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -22,7 +22,7 @@ export const addCategory = async (
   }
 };
 
-export const getCategories = async (
+export const getCategories: RequestHandler = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -36,7 +36,7 @@ export const getCategories = async (
   }
 };
 
-export const getCategoryById = async (
+export const getCategoryById: RequestHandler = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -55,7 +55,7 @@ export const getCategoryById = async (
   }
 };
 
-export const updateCategory = async (
+export const updateCategory: RequestHandler = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -82,7 +82,7 @@ export const updateCategory = async (
   }
 };
 
-export const deleteCategory = async (
+export const deleteCategory: RequestHandler = async (
   req: Request,
   res: Response,
   next: NextFunction

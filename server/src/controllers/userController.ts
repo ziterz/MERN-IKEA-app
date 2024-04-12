@@ -1,25 +1,57 @@
-import { Request, Response, NextFunction } from 'express';
+import { RequestHandler, Request, Response, NextFunction } from 'express';
 import { comparePassword } from '../helpers/bcrypt';
 import { generateToken } from '../helpers/jwt';
 import { User } from '../models/User.model';
+import {
+  IUserLoginResponse,
+  IUserRegisterResponse,
+} from '../interfaces/IResponse';
+import {
+  IUserLoginRequest,
+  IUserRegisterRequest,
+} from '../interfaces/IRequest';
+import { IUser } from '../interfaces/IUser';
 
-export const register = async (
+export const register: RequestHandler = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
   try {
-    const findUser = await User.findOne({ email: req.body.email });
+    const {
+      firstName,
+      lastName,
+      address,
+      postalCode,
+      phoneNumber,
+      email,
+      password,
+      confirmPassword,
+      role,
+    } = req.body as IUserRegisterRequest;
+
+    const findUser: IUser | null = await User.findOne({
+      email,
+    });
 
     if (findUser) {
       throw { name: 'BadRequest', message: 'User already exists' };
     }
 
-    if (req.body.password !== req.body.confirmPassword) {
+    if (password !== confirmPassword) {
       throw { name: 'BadRequest', message: 'Passwords do not match' };
     }
 
-    const user = await User.create(req.body);
+    const user: IUser | null = await User.create({
+      firstName,
+      lastName,
+      address,
+      postalCode,
+      phoneNumber,
+      email,
+      password,
+      role,
+    });
 
     res.status(201).json({
       message: 'User created successfully',
@@ -32,33 +64,36 @@ export const register = async (
         email: user.email,
         role: user.role,
       },
-    });
+    } as IUserRegisterResponse);
   } catch (err: any) {
     next(err);
   }
 };
 
-export const login = async (
+export const login: RequestHandler = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
   try {
-    const { email, password } = req.body;
+    const { email, password } = req.body as IUserLoginRequest;
 
-    const user = await User.findOne({ email: email });
+    const user: IUser | null = await User.findOne({ email });
 
     if (!user) {
       throw { name: 'BadRequest', message: 'Invalid credentials' };
     }
 
-    const isPasswordMatch = await comparePassword(password, user.password);
+    const isPasswordMatch: boolean = await comparePassword(
+      password,
+      user.password
+    );
 
     if (!isPasswordMatch) {
       throw { name: 'BadRequest', message: 'Invalid credentials' };
     }
 
-    const token = generateToken({ userId: user._id.toString() });
+    const token: string = generateToken({ userId: user._id.toString() });
 
     res.cookie('auth_token', token, {
       httpOnly: true,
@@ -75,7 +110,7 @@ export const login = async (
         email: user.email,
         role: user.role,
       },
-    });
+    } as IUserLoginResponse);
   } catch (err: any) {
     next(err);
   }

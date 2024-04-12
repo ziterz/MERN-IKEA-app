@@ -1,12 +1,12 @@
-import { Request, Response, NextFunction } from 'express';
+import { RequestHandler, Request, Response, NextFunction } from 'express';
 
-export const getOrders = async (
+export const getOrders: RequestHandler = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {};
 
-export const getOrderById = async (
+export const getOrderById: RequestHandler = async (
   req: Request,
   res: Response,
   next: NextFunction

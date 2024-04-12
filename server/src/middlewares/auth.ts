@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from 'express';
+import { RequestHandler, Request, Response, NextFunction } from 'express';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import { User } from '../models/User.model';
 
@@ -10,7 +10,7 @@ declare global {
   }
 }
 
-export const authentication = async (
+export const authenticateUser: RequestHandler = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -36,7 +36,7 @@ export const authentication = async (
   }
 };
 
-export const authorization = async (
+export const authorizeUser: RequestHandler = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -54,7 +54,7 @@ export const authorization = async (
   }
 };
 
-export const adminOnly = async (
+export const authorizeAdmin: RequestHandler = async (
   req: Request,
   res: Response,
   next: NextFunction
