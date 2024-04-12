@@ -1,6 +1,6 @@
 import { RequestHandler, Request, Response, NextFunction } from 'express';
-import { comparePassword } from '../helpers/bcrypt';
-import { generateToken } from '../helpers/jwt';
+import { comparePassword } from '../utils/bcrypt';
+import { generateToken } from '../utils/jwt';
 import { User } from '../models/User.model';
 import {
   IUserLoginResponse,

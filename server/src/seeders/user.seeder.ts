@@ -1,5 +1,5 @@
 import { User } from '../models/User.model';
-import { hashPassword } from '../helpers/bcrypt';
+import { hashPassword } from '../utils/bcrypt';
 
 export const userSeeder = async () => {
   const user = [
