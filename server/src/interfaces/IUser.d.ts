@@ -9,5 +9,5 @@ export interface IUser extends Document {
   phoneNumber: string;
   email: string;
   password: string;
-  role: string | 'user';
+  role: string | 'user' | 'admin';
 }

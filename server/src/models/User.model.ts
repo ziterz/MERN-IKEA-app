@@ -50,7 +50,6 @@ const UserSchema = new Schema<IUser>({
 });
 
 UserSchema.pre<IUser>('save', async function (next) {
-  this.role = 'user';
   this.password = await hashPassword(this.password);
 
   return next();
