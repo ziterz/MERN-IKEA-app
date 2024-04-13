@@ -3,7 +3,6 @@ import mongoose from 'mongoose';
 import request from 'supertest';
 import app from '../app';
 import { User } from '../models/User.model';
-import { hashPassword } from '../utils/bcrypt';
 
 const user = {
   firstName: 'Ziady',
@@ -45,7 +44,6 @@ describe('SUCCESS: Register a new user', () => {
 describe('FAIL: Register a new user', () => {
   test('POST /api/auth/register - It should return an error if the email is already registered', async () => {
     const response = await request(app).post('/api/auth/register').send(user);
-
     expect(response.status).toBe(400);
     expect(response.body.message).toBe('User already exists');
   });
@@ -73,9 +71,7 @@ describe('FAIL: Register a new user', () => {
       });
 
     expect(response.status).toBe(400);
-    expect(response.body.message).toBe(
-      'User validation failed: firstName: Path `firstName` is required.'
-    );
+    expect(response.body.message).toBe('First Name is a required field');
   });
 
   test('POST /api/auth/register - It should return an error if `lastName` is empty', async () => {
@@ -88,9 +84,7 @@ describe('FAIL: Register a new user', () => {
       });
 
     expect(response.status).toBe(400);
-    expect(response.body.message).toBe(
-      'User validation failed: lastName: Path `lastName` is required.'
-    );
+    expect(response.body.message).toBe('Last Name is a required field');
   });
 
   test('POST /api/auth/register - It should return an error if `address` is empty', async () => {
@@ -103,9 +97,7 @@ describe('FAIL: Register a new user', () => {
       });
 
     expect(response.status).toBe(400);
-    expect(response.body.message).toBe(
-      'User validation failed: address: Path `address` is required.'
-    );
+    expect(response.body.message).toBe('Address is a required field');
   });
 
   test('POST /api/auth/register - It should return an error if `postalCode` is empty', async () => {
@@ -118,9 +110,7 @@ describe('FAIL: Register a new user', () => {
       });
 
     expect(response.status).toBe(400);
-    expect(response.body.message).toBe(
-      'User validation failed: postalCode: Path `postalCode` is required.'
-    );
+    expect(response.body.message).toBe('Postal Code is a required field');
   });
 
   test('POST /api/auth/register - It should return an error if `email` is empty', async () => {
@@ -132,8 +122,20 @@ describe('FAIL: Register a new user', () => {
       });
 
     expect(response.status).toBe(400);
+    expect(response.body.message).toBe('Email is a required field');
+  });
+
+  test('POST /api/auth/register - It should return an error if `email` is not valid', async () => {
+    const response = await request(app)
+      .post('/api/auth/register')
+      .send({
+        ...user,
+        email: 'ziady@mail@google.com',
+      });
+
+    expect(response.status).toBe(400);
     expect(response.body.message).toBe(
-      'User validation failed: email: Path `email` is required.'
+      'ziady@mail@google.com is not a valid email address'
     );
   });
 
@@ -173,8 +175,72 @@ describe('FAIL: Register a new user', () => {
       });
 
     expect(response.status).toBe(400);
-    expect(response.body.message).toBe(
-      'User validation failed: phoneNumber: Path `phoneNumber` is required.'
-    );
+    expect(response.body.message).toBe('Phone Number is required field');
+  });
+
+  test('POST /api/auth/register - It should return an error if `phoneNumber` is not valid', async () => {
+    const response = await request(app)
+      .post('/api/auth/register')
+      .send({
+        ...user,
+        email: 'ziady9@mail.com',
+        phoneNumber: 'ABCGDSDW',
+      });
+
+    expect(response.status).toBe(400);
+    expect(response.body.message).toBe('ABCGDSDW is not a valid phone number');
+  });
+});
+
+describe('SUCCESS: Login a user', () => {
+  test('POST /api/auth/login - It should return a user without password', async () => {
+    const response = await request(app).post('/api/auth/login').send({
+      email: 'ziady@mail.com',
+      password: 'ziadymubaraq',
+    });
+
+    expect(response.status).toBe(200);
+    expect(response.body.message).toBe('Login successful');
+    expect(response.body.user).toBeDefined();
+    expect(response.body.user.firstName).toBe('Ziady');
+    expect(response.body.user.lastName).toBe('Mubaraq');
+    expect(response.body.user.address).toBe('Jakarta');
+    expect(response.body.user.postalCode).toBe('10000');
+    expect(response.body.user.phoneNumber).toBe('08123456789');
+    expect(response.body.user.email).toBe('ziady@mail.com');
+    expect(response.body.user.role).toBe('user');
+    expect(response.body.user.password).toBeUndefined();
+  });
+});
+
+describe('FAIL: Login a user', () => {
+  test('POST /api/auth/login - It should return an error if the email is not registered or the password is incorrect', async () => {
+    const response = await request(app).post('/api/auth/login').send({
+      email: 'example@mail.com',
+      password: 'examplepassword',
+    });
+
+    expect(response.status).toBe(400);
+    expect(response.body.message).toBe('Invalid email or password');
+  });
+
+  test('POST /api/auth/login - It should return an error if the email is empty', async () => {
+    const response = await request(app).post('/api/auth/login').send({
+      email: 'example@mail.com',
+      password: '',
+    });
+
+    expect(response.status).toBe(400);
+    expect(response.body.message).toBe('Invalid email or password');
+  });
+
+  test('POST /api/auth/login - It should return an error if the password is empty', async () => {
+    const response = await request(app).post('/api/auth/login').send({
+      email: '',
+      password: 'examplepassword',
+    });
+
+    expect(response.status).toBe(400);
+    expect(response.body.message).toBe('Invalid email or password');
   });
 });

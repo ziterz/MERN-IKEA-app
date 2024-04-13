@@ -81,7 +81,7 @@ export const login: RequestHandler = async (
     const user: IUser | null = await User.findOne({ email });
 
     if (!user) {
-      throw { name: 'BadRequest', message: 'Invalid credentials' };
+      throw { name: 'BadRequest', message: 'Invalid email or password' };
     }
 
     const isPasswordMatch: boolean = await comparePassword(
@@ -90,7 +90,7 @@ export const login: RequestHandler = async (
     );
 
     if (!isPasswordMatch) {
-      throw { name: 'BadRequest', message: 'Invalid credentials' };
+      throw { name: 'BadRequest', message: 'Invalid email or password' };
     }
 
     const token: string = generateToken({ userId: user._id.toString() });

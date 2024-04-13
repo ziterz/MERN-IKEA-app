@@ -9,6 +9,8 @@ export const errorHandler: ErrorRequestHandler = (
   console.log(err.name);
   switch (err.name) {
     case 'ValidationError':
+      err.message = err.errors[Object.keys(err.errors)[0]].message;
+      return res.status(400).json({ message: err.message });
     case 'BadRequest':
       return res.status(400).json({ message: err.message });
     case 'Unauthorized':
