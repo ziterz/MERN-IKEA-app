@@ -4,7 +4,11 @@ import { productSeeder } from './product.seeder';
 import { userSeeder } from './user.seeder';
 
 const seeding = async () => {
-  await mongoose.connect(process.env.MONGODB_URI as string);
+  if (process.env.NODE_ENV !== 'production') {
+    await mongoose.connect(process.env.MONGODB_URI_TEST as string);
+  } else {
+    await mongoose.connect(process.env.MONGODB_URI as string);
+  }
   await productSeeder();
   await userSeeder();
 };

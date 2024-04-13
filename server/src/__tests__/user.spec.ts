@@ -28,7 +28,6 @@ const admin = {
 };
 
 beforeAll(async () => {
-  await mongoose.connect(process.env.MONGODB_URI as string);
   await userSeeder();
 });
 
@@ -42,7 +41,10 @@ describe('SUCCESS: Register a new user', () => {
     const response = await request(app).post('/api/auth/register').send(user);
 
     expect(response.status).toBe(201);
-    expect(response.body.message).toBe('User created successfully');
+    expect(response.body).toHaveProperty(
+      'message',
+      'User created successfully'
+    );
     expect(response.body.user).toBeDefined();
     expect(response.body.user.firstName).toBe('Jordan');
     expect(response.body.user.lastName).toBe('Walke');
@@ -84,7 +86,10 @@ describe('FAIL: Register a new user', () => {
       });
 
     expect(response.status).toBe(400);
-    expect(response.body.message).toBe('First Name is a required field');
+    expect(response.body).toHaveProperty(
+      'message',
+      'First Name is a required field'
+    );
   });
 
   test('POST /api/auth/register - It should return an error if `lastName` is empty', async () => {
@@ -97,7 +102,10 @@ describe('FAIL: Register a new user', () => {
       });
 
     expect(response.status).toBe(400);
-    expect(response.body.message).toBe('Last Name is a required field');
+    expect(response.body).toHaveProperty(
+      'message',
+      'Last Name is a required field'
+    );
   });
 
   test('POST /api/auth/register - It should return an error if `address` is empty', async () => {
@@ -110,7 +118,10 @@ describe('FAIL: Register a new user', () => {
       });
 
     expect(response.status).toBe(400);
-    expect(response.body.message).toBe('Address is a required field');
+    expect(response.body).toHaveProperty(
+      'message',
+      'Address is a required field'
+    );
   });
 
   test('POST /api/auth/register - It should return an error if `postalCode` is empty', async () => {
@@ -123,7 +134,10 @@ describe('FAIL: Register a new user', () => {
       });
 
     expect(response.status).toBe(400);
-    expect(response.body.message).toBe('Postal Code is a required field');
+    expect(response.body).toHaveProperty(
+      'message',
+      'Postal Code is a required field'
+    );
   });
 
   test('POST /api/auth/register - It should return an error if `email` is empty', async () => {
@@ -135,7 +149,10 @@ describe('FAIL: Register a new user', () => {
       });
 
     expect(response.status).toBe(400);
-    expect(response.body.message).toBe('Email is a required field');
+    expect(response.body).toHaveProperty(
+      'message',
+      'Email is a required field'
+    );
   });
 
   test('POST /api/auth/register - It should return an error if `email` is not valid', async () => {
@@ -147,7 +164,8 @@ describe('FAIL: Register a new user', () => {
       });
 
     expect(response.status).toBe(400);
-    expect(response.body.message).toBe(
+    expect(response.body).toHaveProperty(
+      'message',
       'jord@walke@meta.com is not a valid email address'
     );
   });
@@ -188,7 +206,10 @@ describe('FAIL: Register a new user', () => {
       });
 
     expect(response.status).toBe(400);
-    expect(response.body.message).toBe('Phone Number is required field');
+    expect(response.body).toHaveProperty(
+      'message',
+      'Phone Number is required field'
+    );
   });
 
   test('POST /api/auth/register - It should return an error if `phoneNumber` is not valid', async () => {
@@ -201,7 +222,10 @@ describe('FAIL: Register a new user', () => {
       });
 
     expect(response.status).toBe(400);
-    expect(response.body.message).toBe('ABCGDSDW is not a valid phone number');
+    expect(response.body).toHaveProperty(
+      'message',
+      'ABCGDSDW is not a valid phone number'
+    );
   });
 });
 
@@ -210,7 +234,10 @@ describe('SUCCESS: Register a new admin', () => {
     const response = await request(app).post('/api/auth/register').send(admin);
 
     expect(response.status).toBe(201);
-    expect(response.body.message).toBe('User created successfully');
+    expect(response.body).toHaveProperty(
+      'message',
+      'User created successfully'
+    );
     expect(response.body.user).toBeDefined();
     expect(response.body.user.firstName).toBe('Mark');
     expect(response.body.user.lastName).toBe('Zuckerberg');
@@ -252,7 +279,10 @@ describe('FAIL: Register a new admin', () => {
       });
 
     expect(response.status).toBe(400);
-    expect(response.body.message).toBe('First Name is a required field');
+    expect(response.body).toHaveProperty(
+      'message',
+      'First Name is a required field'
+    );
   });
 
   test('POST /api/auth/register - It should return an error if `lastName` is empty', async () => {
@@ -265,7 +295,10 @@ describe('FAIL: Register a new admin', () => {
       });
 
     expect(response.status).toBe(400);
-    expect(response.body.message).toBe('Last Name is a required field');
+    expect(response.body).toHaveProperty(
+      'message',
+      'Last Name is a required field'
+    );
   });
 
   test('POST /api/auth/register - It should return an error if `address` is empty', async () => {
@@ -278,7 +311,10 @@ describe('FAIL: Register a new admin', () => {
       });
 
     expect(response.status).toBe(400);
-    expect(response.body.message).toBe('Address is a required field');
+    expect(response.body).toHaveProperty(
+      'message',
+      'Address is a required field'
+    );
   });
 
   test('POST /api/auth/register - It should return an error if `postalCode` is empty', async () => {
@@ -291,7 +327,10 @@ describe('FAIL: Register a new admin', () => {
       });
 
     expect(response.status).toBe(400);
-    expect(response.body.message).toBe('Postal Code is a required field');
+    expect(response.body).toHaveProperty(
+      'message',
+      'Postal Code is a required field'
+    );
   });
 
   test('POST /api/auth/register - It should return an error if `email` is empty', async () => {
@@ -303,7 +342,10 @@ describe('FAIL: Register a new admin', () => {
       });
 
     expect(response.status).toBe(400);
-    expect(response.body.message).toBe('Email is a required field');
+    expect(response.body).toHaveProperty(
+      'message',
+      'Email is a required field'
+    );
   });
 
   test('POST /api/auth/register - It should return an error if `email` is not valid', async () => {
@@ -315,7 +357,8 @@ describe('FAIL: Register a new admin', () => {
       });
 
     expect(response.status).toBe(400);
-    expect(response.body.message).toBe(
+    expect(response.body).toHaveProperty(
+      'message',
       'mark@zuckerberg@meta.com is not a valid email address'
     );
   });
@@ -356,7 +399,10 @@ describe('FAIL: Register a new admin', () => {
       });
 
     expect(response.status).toBe(400);
-    expect(response.body.message).toBe('Phone Number is required field');
+    expect(response.body).toHaveProperty(
+      'message',
+      'Phone Number is required field'
+    );
   });
 
   test('POST /api/auth/register - It should return an error if `phoneNumber` is not valid', async () => {
@@ -369,7 +415,8 @@ describe('FAIL: Register a new admin', () => {
       });
 
     expect(response.status).toBe(400);
-    expect(response.body.message).toBe(
+    expect(response.body).toHaveProperty(
+      'message',
       'PQRSTUVWXY is not a valid phone number'
     );
   });
@@ -404,7 +451,10 @@ describe('FAIL: Login a user', () => {
     });
 
     expect(response.status).toBe(400);
-    expect(response.body.message).toBe('Invalid email or password');
+    expect(response.body).toHaveProperty(
+      'message',
+      'Invalid email or password'
+    );
   });
 
   test('POST /api/auth/login - It should return an error if the email is empty', async () => {
@@ -414,7 +464,10 @@ describe('FAIL: Login a user', () => {
     });
 
     expect(response.status).toBe(400);
-    expect(response.body.message).toBe('Invalid email or password');
+    expect(response.body).toHaveProperty(
+      'message',
+      'Invalid email or password'
+    );
   });
 
   test('POST /api/auth/login - It should return an error if the password is empty', async () => {
@@ -424,6 +477,9 @@ describe('FAIL: Login a user', () => {
     });
 
     expect(response.status).toBe(400);
-    expect(response.body.message).toBe('Invalid email or password');
+    expect(response.body).toHaveProperty(
+      'message',
+      'Invalid email or password'
+    );
   });
 });

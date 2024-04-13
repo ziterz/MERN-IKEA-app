@@ -47,6 +47,11 @@ export const getProductById: RequestHandler = async (
 ) => {
   try {
     const { id } = req.params;
+
+    if (!id.match(/^[0-9a-fA-F]{24}$/)) {
+      throw { name: 'BadRequest', message: 'Invalid product id' };
+    }
+
     const product = await Product.findById(id).populate('category');
 
     if (!product) {
@@ -70,7 +75,7 @@ export const updateProduct: RequestHandler = async (
     const product = await Product.findByIdAndUpdate(
       id,
       { name, description, price, stock, images },
-      { new: true }
+      { runValidators: true }
     ).populate('category');
 
     if (!product) {

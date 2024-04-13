@@ -43,6 +43,11 @@ export const getCategoryById: RequestHandler = async (
 ) => {
   try {
     const { id } = req.params;
+
+    if (!id.match(/^[0-9a-fA-F]{24}$/)) {
+      throw { name: 'BadRequest', message: 'Invalid category id' };
+    }
+
     const category = await Category.findById(id);
 
     if (!category) {
@@ -63,10 +68,15 @@ export const updateCategory: RequestHandler = async (
   try {
     const { id } = req.params;
     const { name, image } = req.body;
+
+    if (!id.match(/^[0-9a-fA-F]{24}$/)) {
+      throw { name: 'BadRequest', message: 'Invalid category id' };
+    }
+
     const category = await Category.findByIdAndUpdate(
       id,
       { name, image },
-      { new: true }
+      { runValidators: true }
     );
 
     if (!category) {
@@ -89,6 +99,11 @@ export const deleteCategory: RequestHandler = async (
 ) => {
   try {
     const { id } = req.params;
+
+    if (!id.match(/^[0-9a-fA-F]{24}$/)) {
+      throw { name: 'BadRequest', message: 'Invalid category id' };
+    }
+
     const category = await Category.findByIdAndDelete(id);
 
     if (!category) {

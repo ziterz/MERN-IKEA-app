@@ -1,4 +1,4 @@
-import 'dotenv/config';
+import dotenv from 'dotenv';
 import express, { Application, json, urlencoded } from 'express';
 import mongoose from 'mongoose';
 import cookieParser from 'cookie-parser';
@@ -10,6 +10,10 @@ import cart from './routes/cart';
 import order from './routes/order';
 import { errorHandler } from './middlewares/errorHandler';
 
+if (process.env.NODE_ENV !== 'production') {
+  dotenv.config();
+}
+
 const app: Application = express();
 
 const corsOptions = {
@@ -20,8 +24,13 @@ const corsOptions = {
 };
 
 const connect = async () => {
-  await mongoose.connect(process.env.MONGODB_URI as string);
-  console.log('Connected to MongoDB Successfully');
+  if (process.env.NODE_ENV !== 'production') {
+    await mongoose.connect(process.env.MONGODB_URI_TEST as string);
+    console.log('Connected to MongoDB Successfully');
+  } else {
+    await mongoose.connect(process.env.MONGODB_URI as string);
+    console.log('Connected to MongoDB Successfully');
+  }
 };
 
 connect().catch((err) => console.log(err));
