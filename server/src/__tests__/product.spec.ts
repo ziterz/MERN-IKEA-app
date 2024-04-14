@@ -1,4 +1,4 @@
-import 'dotenv/config';
+import { beforeAll, afterAll, describe, test, expect } from '@jest/globals';
 import mongoose from 'mongoose';
 import request from 'supertest';
 import app from '../app';
@@ -24,8 +24,14 @@ let product = {
 };
 
 beforeAll(async () => {
-  await productSeeder();
   await userSeeder();
+  await productSeeder();
+
+  const response = await request(app)
+    .post('/api/auth/login')
+    .send({ email: 'admin@mail.com', password: 'admin123' });
+
+  cookie = response.header['set-cookie'][0];
 
   categoryId = await Category.findOne()
     .select('_id')
@@ -43,12 +49,6 @@ beforeAll(async () => {
     .then((product) => {
       return product?._id;
     });
-
-  const response = await request(app)
-    .post('/api/auth/login')
-    .send({ email: 'admin@mail.com', password: 'admin123' });
-
-  cookie = response.header['set-cookie'][0];
 });
 
 afterAll(async () => {
@@ -59,14 +59,6 @@ afterAll(async () => {
 });
 
 describe('SUCCESS: Create a new product', () => {
-  beforeEach(async () => {
-    categoryId = await Category.findOne()
-      .select('_id')
-      .then((category) => {
-        return category?._id;
-      });
-  });
-
   test('POST /api/products - It should return a new product', async () => {
     const response = await request(app)
       .post('/api/products')
@@ -104,3 +96,5 @@ describe('SUCCESS: Create a new product', () => {
     );
   });
 });
+
+// TODO: Other products endpoint

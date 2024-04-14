@@ -6,7 +6,7 @@ export const errorHandler: ErrorRequestHandler = (
   res: Response,
   next: NextFunction
 ) => {
-  // console.log(err.name, err.message);
+  console.log(err.name, err.message);
   switch (err.name) {
     case 'ValidationError':
       err.message = err.errors[Object.keys(err.errors)[0]].message;
@@ -14,7 +14,7 @@ export const errorHandler: ErrorRequestHandler = (
     case 'BadRequest':
       return res.status(400).json({ message: err.message });
     case 'Unauthorized':
-      return res.status(401).json({ message: 'Unauthorized' });
+      return res.status(401).json({ message: 'User not authorized' });
     case 'Forbidden':
       return res.status(403).json({ message: 'Forbidden access' });
     case 'NotFound':

@@ -14,6 +14,10 @@ export const addToCart: RequestHandler = async (
   try {
     const { productId, quantity } = req.body;
 
+    if (!productId.match(/^[0-9a-fA-F]{24}$/)) {
+      throw { name: 'BadRequest', message: 'Invalid product id' };
+    }
+
     const product: IProduct | null = await Product.findById(productId);
 
     if (!product) {

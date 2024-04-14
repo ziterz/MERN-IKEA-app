@@ -6,7 +6,6 @@
   "scripts": {
     "dev:seed": "ts-node src/seeders/index.ts",
     "dev": "nodemon src/server.ts",
-    "test:seed": "ts-node src/seeders/index.ts",
     "test": "jest --runInBand --detectOpenHandles --forceExit",
     "build": "npx tsc",
     "start": "node dist/server.js"
@@ -24,6 +23,7 @@
     "mongoose": "^8.2.4"
   },
   "devDependencies": {
+    "@jest/globals": "^29.7.0",
     "@types/bcrypt": "^5.0.2",
     "@types/cookie-parser": "^1.4.7",
     "@types/cors": "^2.8.17",

@@ -1,4 +1,4 @@
-import 'dotenv/config';
+import { beforeAll, afterAll, describe, test, expect } from '@jest/globals';
 import mongoose from 'mongoose';
 import request from 'supertest';
 import app from '../app';
@@ -17,8 +17,8 @@ const category = {
 };
 
 beforeAll(async () => {
-  await productSeeder();
   await userSeeder();
+  await productSeeder();
 
   categoryId = await Category.findOne()
     .select('_id')
@@ -61,7 +61,7 @@ describe('FAIL: Create a new category', () => {
     const response = await request(app).post('/api/categories').send(category);
 
     expect(response.status).toBe(401);
-    expect(response.body.message).toBe('Unauthorized');
+    expect(response.body.message).toBe('User not authorized');
   });
 
   test('POST /api/categories - It should return an error if `name` is empty', async () => {
@@ -165,7 +165,7 @@ describe('FAIL: Update a category', () => {
       });
 
     expect(response.status).toBe(401);
-    expect(response.body.message).toBe('Unauthorized');
+    expect(response.body.message).toBe('User not authorized');
   });
 
   test('PUT /api/categories/:id - It should return an invalid id format', async () => {
@@ -225,7 +225,7 @@ describe('FAIL: Delete a category', () => {
     const response = await request(app).delete(`/api/categories/${categoryId}`);
 
     expect(response.status).toBe(401);
-    expect(response.body.message).toBe('Unauthorized');
+    expect(response.body.message).toBe('User not authorized');
   });
 
   test('DELETE /api/categories/:id - It should return an invalid id format', async () => {
