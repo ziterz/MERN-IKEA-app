@@ -4,11 +4,12 @@
   "description": "",
   "main": "server.js",
   "scripts": {
+    "dev:seed": "ts-node src/seeders/index.ts",
     "dev": "nodemon src/server.ts",
-    "seed": "ts-node src/seeders/index.ts",
+    "test:seed": "ts-node src/seeders/index.ts",
+    "test": "jest --runInBand --detectOpenHandles --forceExit",
     "build": "npx tsc",
-    "start": "node dist/server.js",
-    "test": "jest --runInBand --detectOpenHandles --forceExit"
+    "start": "node dist/server.js"
   },
   "keywords": [],
   "author": "Ziady Mubaraq",

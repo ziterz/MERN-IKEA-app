@@ -72,7 +72,12 @@ export const getCart: RequestHandler = async (
   try {
     const cart: ICart | null = await Cart.findOne({
       user: req.userId,
-    }).populate('items.product');
+    }).populate({
+      path: 'items.product',
+      populate: {
+        path: 'category',
+      },
+    });
 
     if (!cart) {
       throw { name: 'NotFound', message: 'Cart not found' };

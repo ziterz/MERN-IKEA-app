@@ -25,9 +25,6 @@ const corsOptions = {
 
 const connect = async () => {
   if (process.env.NODE_ENV !== 'production') {
-    await mongoose.connect(process.env.MONGODB_URI_TEST as string);
-    console.log('Connected to MongoDB Successfully');
-  } else {
     await mongoose.connect(process.env.MONGODB_URI as string);
     console.log('Connected to MongoDB Successfully');
   }

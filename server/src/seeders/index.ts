@@ -5,8 +5,6 @@ import { userSeeder } from './user.seeder';
 
 const seeding = async () => {
   if (process.env.NODE_ENV !== 'production') {
-    await mongoose.connect(process.env.MONGODB_URI_TEST as string);
-  } else {
     await mongoose.connect(process.env.MONGODB_URI as string);
   }
   await productSeeder();

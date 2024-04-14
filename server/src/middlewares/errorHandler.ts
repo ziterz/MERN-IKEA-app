@@ -6,7 +6,7 @@ export const errorHandler: ErrorRequestHandler = (
   res: Response,
   next: NextFunction
 ) => {
-  console.log(err.name, err.message);
+  // console.log(err.name, err.message);
   switch (err.name) {
     case 'ValidationError':
       err.message = err.errors[Object.keys(err.errors)[0]].message;

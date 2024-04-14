@@ -8,13 +8,13 @@ import { User } from '../models/User.model';
 import { productSeeder } from '../seeders/product.seeder';
 import { userSeeder } from '../seeders/user.seeder';
 
+let cookie: string;
+let categoryId: mongoose.Types.ObjectId | undefined;
 const category = {
   name: 'Lighting',
   image:
     'https://www.ikea.com/global/assets/range-categorisation/images/wall-lights-20503.jpeg?imwidth=300',
 };
-let cookie: string;
-let categoryId: mongoose.Types.ObjectId | undefined;
 
 beforeAll(async () => {
   await productSeeder();
