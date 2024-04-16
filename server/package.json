@@ -6,7 +6,7 @@
   "scripts": {
     "dev:seed": "ts-node src/seeders/index.ts",
     "dev": "nodemon src/server.ts",
-    "test": "jest --runInBand --detectOpenHandles --forceExit --verbose",
+    "test": "jest --runInBand --detectOpenHandles --forceExit --coverage",
     "build": "npx tsc",
     "start": "node dist/server.js"
   },

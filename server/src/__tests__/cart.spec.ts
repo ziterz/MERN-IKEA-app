@@ -1,4 +1,11 @@
-import { beforeAll, afterAll, describe, test, expect } from '@jest/globals';
+import {
+  beforeAll,
+  beforeEach,
+  afterAll,
+  describe,
+  test,
+  expect,
+} from '@jest/globals';
 import mongoose from 'mongoose';
 import request from 'supertest';
 import app from '../app';
@@ -7,10 +14,11 @@ import { userSeeder } from '../seeders/user.seeder';
 import { Category } from '../models/Category.model';
 import { Product } from '../models/Product.model';
 import { User } from '../models/User.model';
-import category from '../routes/category';
-import exp from 'constants';
+import { Cart } from '../models/Cart.model';
+import { Order } from '../models/Order.model';
 
 let cookie: string;
+let userId: mongoose.Types.ObjectId | undefined;
 let productId: mongoose.Types.ObjectId | undefined;
 let emptyStockProductId: mongoose.Types.ObjectId | undefined;
 let categoryId: mongoose.Types.ObjectId | undefined;
@@ -33,6 +41,12 @@ beforeAll(async () => {
   const response = await request(app)
     .post('/api/auth/login')
     .send({ email: 'user@mail.com', password: 'user123' });
+
+  userId = await User.findOne({ email: 'user@mail.com' })
+    .select('_id')
+    .then((category) => {
+      return category?._id;
+    });
 
   cookie = response.header['set-cookie'][0];
 
@@ -60,12 +74,19 @@ beforeAll(async () => {
     .then((product) => {
       return product?._id;
     });
+
+  await Cart.create({
+    user: userId,
+    items: [{ product: productId, quantity: 1 }],
+  });
 });
 
 afterAll(async () => {
   await Category.deleteMany({});
   await Product.deleteMany({});
   await User.deleteMany({});
+  await Cart.deleteMany({});
+  await Order.deleteMany({});
   await mongoose.connection.close();
 });
 
@@ -198,7 +219,7 @@ describe('FAIL: Get cart by user', () => {
 });
 
 describe('SUCCESS: Update cart by user', () => {
-  test('PATCH /api/carts/:id - It should return an updated cart', async () => {
+  test('PATCH /api/carts - It should return an updated cart', async () => {
     const response = await request(app)
       .patch(`/api/carts`)
       .set('Cookie', cookie)
@@ -210,7 +231,7 @@ describe('SUCCESS: Update cart by user', () => {
 });
 
 describe('FAIL: Update cart by user', () => {
-  test('PATCH /api/carts/:id - It should return an unauthorized error', async () => {
+  test('PATCH /api/carts - It should return an unauthorized error', async () => {
     const response = await request(app)
       .patch(`/api/carts`)
       .send({ productId, quantity: 1 });
@@ -219,7 +240,7 @@ describe('FAIL: Update cart by user', () => {
     expect(response.body.message).toBe('User not authorized');
   });
 
-  test('PATCH /api/carts/:id - It should return an invalid id format if empty', async () => {
+  test('PATCH /api/carts - It should return an invalid id format if empty', async () => {
     const response = await request(app)
       .patch(`/api/carts`)
       .set('Cookie', cookie)
@@ -229,7 +250,7 @@ describe('FAIL: Update cart by user', () => {
     expect(response.body.message).toBe('Invalid product id');
   });
 
-  test('PATCH /api/carts/:id - It should return an invalid id format', async () => {
+  test('PATCH /api/carts - It should return an invalid id format', async () => {
     const response = await request(app)
       .patch(`/api/carts`)
       .set('Cookie', cookie)
@@ -239,7 +260,7 @@ describe('FAIL: Update cart by user', () => {
     expect(response.body.message).toBe('Invalid product id');
   });
 
-  test('PATCH /api/carts/:id - It should return a product not found', async () => {
+  test('PATCH /api/carts - It should return a product not found', async () => {
     const response = await request(app)
       .patch(`/api/carts`)
       .set('Cookie', cookie)
@@ -249,7 +270,7 @@ describe('FAIL: Update cart by user', () => {
     expect(response.body.message).toBe('Product not found');
   });
 
-  test('PATCH /api/carts/:id - It should return a product is out of stock', async () => {
+  test('PATCH /api/carts - It should return a product is out of stock', async () => {
     const response = await request(app)
       .patch(`/api/carts`)
       .set('Cookie', cookie)
@@ -257,5 +278,68 @@ describe('FAIL: Update cart by user', () => {
 
     expect(response.status).toBe(400);
     expect(response.body.message).toBe('Product is out of stock');
+  });
+});
+
+describe('FAIL: Update cart by user', () => {
+  beforeEach(async () => {
+    await Cart.deleteOne({ user: userId });
+  });
+
+  test('PATCH /api/carts - It should return a cart not found', async () => {
+    const response = await request(app)
+      .patch(`/api/carts`)
+      .set('Cookie', cookie)
+      .send({ productId, quantity: 1 });
+
+    expect(response.status).toBe(404);
+    expect(response.body.message).toBe('Cart not found');
+  });
+});
+
+describe('SUCCESS: Delete cart by user', () => {
+  beforeEach(async () => {
+    await Cart.create({
+      user: userId,
+      items: [{ product: productId, quantity: 1 }],
+    });
+  });
+
+  test('DELETE /api/carts - It should return a deleted cart', async () => {
+    const response = await request(app)
+      .delete(`/api/carts`)
+      .set('Cookie', cookie);
+
+    expect(response.status).toBe(200);
+    expect(response.body.message).toBe('Cart deleted successfully');
+  });
+});
+
+describe('FAIL: Delete cart by user', () => {
+  test('DELETE /api/carts - It should return an unauthorized error', async () => {
+    const response = await request(app).delete(`/api/carts`);
+
+    expect(response.status).toBe(401);
+    expect(response.body.message).toBe('User not authorized');
+  });
+});
+
+describe('SUCCESS: Checkout cart by user', () => {
+  beforeEach(async () => {
+    await Cart.create({
+      user: userId,
+      items: [{ product: productId, quantity: 1 }],
+    });
+  });
+
+  test('POST /api/carts/checkout - It should return a success message', async () => {
+    const response = await request(app)
+      .post(`/api/carts/checkout`)
+      .set('Cookie', cookie);
+
+    expect(response.status).toBe(200);
+    expect(response.body.message).toBe(
+      'Checkout successful, please do payment'
+    );
   });
 });

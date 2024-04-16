@@ -129,12 +129,13 @@ export const updateCart: RequestHandler = async (
       throw { name: 'NotFound', message: 'Product not found' };
     }
 
-    // check out of stock
     const checkStock: IProduct | null = await Product.findById(productId)
       .where('stock')
       .gt(0);
 
     if (!checkStock) {
+      throw { name: 'BadRequest', message: 'Product is out of stock' };
+    }
 
     const cart: ICart | null = await Cart.findOne({ user: req.userId });
 
@@ -271,7 +272,7 @@ export const checkout: RequestHandler = async (
     session.endSession();
 
     return res.status(200).json({
-      message: `Checkout successful, please do payment with Rp${total}`,
+      message: 'Checkout successful, please do payment',
     });
   } catch (err: any) {
     await session.abortTransaction();

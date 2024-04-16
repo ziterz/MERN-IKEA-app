@@ -8,7 +8,10 @@ import { User } from '../models/User.model';
 import { productSeeder } from '../seeders/product.seeder';
 import { userSeeder } from '../seeders/user.seeder';
 
-let cookie: string;
+let adminCookie: string;
+let userCookie: string;
+let fakeCookie =
+  'auth_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NjFjMjUxYmE1NzM2ZjliOWIxMTliNzciLCJpYXQiOjE3MTMxMjA1NDcsImV4cCI6MTcxNTcxMjU0N30.lqnuRC4xwoTuSzBs7zZNWu8I8_6YxrRKOUwmcZiXPt4; Path=/; HttpOnly;';
 let categoryId: mongoose.Types.ObjectId | undefined;
 const category = {
   name: 'Lighting',
@@ -26,11 +29,17 @@ beforeAll(async () => {
       return category?._id;
     });
 
-  const response = await request(app)
+  const admin = await request(app)
     .post('/api/auth/login')
     .send({ email: 'admin@mail.com', password: 'admin123' });
 
-  cookie = response.header['set-cookie'][0];
+  adminCookie = admin.header['set-cookie'][0];
+
+  const user = await request(app)
+    .post('/api/auth/login')
+    .send({ email: 'user@mail.com', password: 'user123' });
+
+  userCookie = user.header['set-cookie'][0];
 });
 
 afterAll(async () => {
@@ -44,7 +53,7 @@ describe('SUCCESS: Create a new category', () => {
   test('POST /api/categories - It should return a new category', async () => {
     const response = await request(app)
       .post('/api/categories')
-      .set('Cookie', cookie)
+      .set('Cookie', adminCookie)
       .send(category);
 
     expect(response.status).toBe(201);
@@ -64,10 +73,30 @@ describe('FAIL: Create a new category', () => {
     expect(response.body.message).toBe('User not authorized');
   });
 
+  test('POST /api/categories - It should return an unauthorized error', async () => {
+    const response = await request(app)
+      .post('/api/categories')
+      .set('Cookie', fakeCookie)
+      .send(category);
+
+    expect(response.status).toBe(401);
+    expect(response.body.message).toBe('User not authorized');
+  });
+
+  test('POST /api/categories - It should return a forbidden access error', async () => {
+    const response = await request(app)
+      .post('/api/categories')
+      .set('Cookie', userCookie)
+      .send(category);
+
+    expect(response.status).toBe(403);
+    expect(response.body.message).toBe('Forbidden access');
+  });
+
   test('POST /api/categories - It should return an error if `name` is empty', async () => {
     const response = await request(app)
       .post('/api/categories')
-      .set('Cookie', cookie)
+      .set('Cookie', adminCookie)
       .send({ ...category, name: '' });
 
     expect(response.status).toBe(400);
@@ -77,7 +106,7 @@ describe('FAIL: Create a new category', () => {
   test('POST /api/categories - It should return an error if `image` is empty', async () => {
     const response = await request(app)
       .post('/api/categories')
-      .set('Cookie', cookie)
+      .set('Cookie', adminCookie)
       .send({ ...category, image: '' });
 
     expect(response.status).toBe(400);
@@ -138,7 +167,7 @@ describe('SUCCESS: Update a category', () => {
   test('PUT /api/categories/:id - It should return an updated category', async () => {
     const response = await request(app)
       .put(`/api/categories/${categoryId}`)
-      .set('Cookie', cookie)
+      .set('Cookie', adminCookie)
       .send({
         name: 'Furniture',
         image:
@@ -168,10 +197,24 @@ describe('FAIL: Update a category', () => {
     expect(response.body.message).toBe('User not authorized');
   });
 
+  test('PUT /api/categories/:id - It should return a forbidden access error', async () => {
+    const response = await request(app)
+      .put(`/api/categories/${categoryId}`)
+      .set('Cookie', userCookie)
+      .send({
+        name: 'Furniture',
+        image:
+          'https://www.ikea.com/global/assets/range-categorisation/images/wall-lights-20503.jpeg?imwidth=300',
+      });
+
+    expect(response.status).toBe(403);
+    expect(response.body.message).toBe('Forbidden access');
+  });
+
   test('PUT /api/categories/:id - It should return an invalid id format', async () => {
     const response = await request(app)
       .put('/api/categories/123')
-      .set('Cookie', cookie)
+      .set('Cookie', adminCookie)
       .send(category);
 
     expect(response.status).toBe(400);
@@ -181,7 +224,7 @@ describe('FAIL: Update a category', () => {
   test('PUT /api/categories/:id - It should return a category not found', async () => {
     const response = await request(app)
       .put('/api/categories/666666666666666666666666')
-      .set('Cookie', cookie)
+      .set('Cookie', adminCookie)
       .send(category);
 
     expect(response.status).toBe(404);
@@ -191,7 +234,7 @@ describe('FAIL: Update a category', () => {
   test('PUT /api/categories/:id - It should return an error if `name` is empty', async () => {
     const response = await request(app)
       .put(`/api/categories/${categoryId}`)
-      .set('Cookie', cookie)
+      .set('Cookie', adminCookie)
       .send({ ...category, name: '' });
 
     expect(response.status).toBe(400);
@@ -201,7 +244,7 @@ describe('FAIL: Update a category', () => {
   test('PUT /api/categories/:id - It should return an error if `image` is empty', async () => {
     const response = await request(app)
       .put(`/api/categories/${categoryId}`)
-      .set('Cookie', cookie)
+      .set('Cookie', adminCookie)
       .send({ ...category, image: '' });
 
     expect(response.status).toBe(400);
@@ -213,7 +256,7 @@ describe('SUCCESS: Delete a category', () => {
   test('DELETE /api/categories/:id - It should return a success message', async () => {
     const response = await request(app)
       .delete(`/api/categories/${categoryId}`)
-      .set('Cookie', cookie);
+      .set('Cookie', adminCookie);
 
     expect(response.status).toBe(200);
     expect(response.body.message).toBe('Category deleted successfully');
@@ -228,10 +271,19 @@ describe('FAIL: Delete a category', () => {
     expect(response.body.message).toBe('User not authorized');
   });
 
+  test('DELETE /api/categories/:id - It should return a forbidden access error', async () => {
+    const response = await request(app)
+      .delete(`/api/categories/${categoryId}`)
+      .set('Cookie', userCookie);
+
+    expect(response.status).toBe(403);
+    expect(response.body.message).toBe('Forbidden access');
+  });
+
   test('DELETE /api/categories/:id - It should return an invalid id format', async () => {
     const response = await request(app)
       .delete('/api/categories/123')
-      .set('Cookie', cookie);
+      .set('Cookie', adminCookie);
 
     expect(response.status).toBe(400);
     expect(response.body.message).toBe('Invalid category id');
@@ -240,7 +292,7 @@ describe('FAIL: Delete a category', () => {
   test('DELETE /api/categories/:id - It should return a category not found', async () => {
     const response = await request(app)
       .delete('/api/categories/666666666666666666666666')
-      .set('Cookie', cookie);
+      .set('Cookie', adminCookie);
 
     expect(response.status).toBe(404);
     expect(response.body.message).toBe('Category not found');

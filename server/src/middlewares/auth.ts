@@ -1,6 +1,7 @@
 import { RequestHandler, Request, Response, NextFunction } from 'express';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import { User } from '../models/User.model';
+import { verifyToken } from '../utils/jwt';
 
 declare global {
   namespace Express {
@@ -22,7 +23,7 @@ export const authenticateUser: RequestHandler = async (
       throw { name: 'Unauthorized' };
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET as string);
+    const decoded = verifyToken(token);
     req.userId = (decoded as JwtPayload).userId;
     const user = await User.findById(req.userId);
 

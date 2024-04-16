@@ -7,9 +7,9 @@ import { Product } from '../models/Product.model';
 import { User } from '../models/User.model';
 import { productSeeder } from '../seeders/product.seeder';
 import { userSeeder } from '../seeders/user.seeder';
-import exp from 'constants';
 
-let cookie: string;
+let adminCookie: string;
+let userCookie: string;
 let categoryId: mongoose.Types.ObjectId | undefined;
 let productId: mongoose.Types.ObjectId | undefined;
 let product = {
@@ -28,11 +28,17 @@ beforeAll(async () => {
   await userSeeder();
   await productSeeder();
 
-  const response = await request(app)
+  const admin = await request(app)
     .post('/api/auth/login')
     .send({ email: 'admin@mail.com', password: 'admin123' });
 
-  cookie = response.header['set-cookie'][0];
+  adminCookie = admin.header['set-cookie'][0];
+
+  const user = await request(app)
+    .post('/api/auth/login')
+    .send({ email: 'user@mail.com', password: 'user123' });
+
+  userCookie = user.header['set-cookie'][0];
 
   categoryId = await Category.findOne()
     .select('_id')
@@ -63,7 +69,7 @@ describe('SUCCESS: Create a new product', () => {
   test('POST /api/products - It should return a new product', async () => {
     const response = await request(app)
       .post('/api/products')
-      .set('Cookie', cookie)
+      .set('Cookie', adminCookie)
       .send(product);
 
     expect(response.status).toBe(201);
@@ -106,10 +112,20 @@ describe('FAIL: Create a new product', () => {
     expect(response.body.message).toBe('User not authorized');
   });
 
+  test('POST /api/products - It should return a forbidden access error', async () => {
+    const response = await request(app)
+      .post('/api/products')
+      .set('Cookie', userCookie)
+      .send(product);
+
+    expect(response.status).toBe(403);
+    expect(response.body.message).toBe('Forbidden access');
+  });
+
   test('POST /api/products - It should return an error if `name` is empty', async () => {
     const response = await request(app)
       .post('/api/products')
-      .set('Cookie', cookie)
+      .set('Cookie', adminCookie)
       .send({ ...product, name: '' });
 
     expect(response.status).toBe(400);
@@ -119,7 +135,7 @@ describe('FAIL: Create a new product', () => {
   test('POST /api/products - It should return an error if `description` is empty', async () => {
     const response = await request(app)
       .post('/api/products')
-      .set('Cookie', cookie)
+      .set('Cookie', adminCookie)
       .send({ ...product, description: '' });
 
     expect(response.status).toBe(400);
@@ -129,7 +145,7 @@ describe('FAIL: Create a new product', () => {
   test('POST /api/products - It should return an error if `price` is empty', async () => {
     const response = await request(app)
       .post('/api/products')
-      .set('Cookie', cookie)
+      .set('Cookie', adminCookie)
       .send({ ...product, price: '' });
 
     expect(response.status).toBe(400);
@@ -139,7 +155,7 @@ describe('FAIL: Create a new product', () => {
   test('POST /api/products - It should return an error if `price` is not an integer value', async () => {
     const response = await request(app)
       .post('/api/products')
-      .set('Cookie', cookie)
+      .set('Cookie', adminCookie)
       .send({ ...product, price: 'ABC' });
 
     expect(response.status).toBe(400);
@@ -149,7 +165,7 @@ describe('FAIL: Create a new product', () => {
   test('POST /api/products - It should return an error if `stock` is empty', async () => {
     const response = await request(app)
       .post('/api/products')
-      .set('Cookie', cookie)
+      .set('Cookie', adminCookie)
       .send({ ...product, stock: '' });
 
     expect(response.status).toBe(400);
@@ -159,7 +175,7 @@ describe('FAIL: Create a new product', () => {
   test('POST /api/products - It should return an error if `stock` is not an integer value', async () => {
     const response = await request(app)
       .post('/api/products')
-      .set('Cookie', cookie)
+      .set('Cookie', adminCookie)
       .send({ ...product, stock: 'ABC' });
 
     expect(response.status).toBe(400);
@@ -169,7 +185,7 @@ describe('FAIL: Create a new product', () => {
   test('POST /api/products - It should return an error if `images` is empty', async () => {
     const response = await request(app)
       .post('/api/products')
-      .set('Cookie', cookie)
+      .set('Cookie', adminCookie)
       .send({ ...product, images: [] });
 
     expect(response.status).toBe(400);
@@ -266,7 +282,7 @@ describe('SUCCESS: Update a product', () => {
   test('PUT /api/products/:id - It should return an updated product', async () => {
     const response = await request(app)
       .put(`/api/products/${productId}`)
-      .set('Cookie', cookie)
+      .set('Cookie', adminCookie)
       .send({ ...product, name: 'Updated product' });
 
     expect(response.status).toBe(200);
@@ -311,10 +327,20 @@ describe('FAIL: Update a product', () => {
     expect(response.body.message).toBe('User not authorized');
   });
 
+  test('PUT /api/products/:id - It should return a forbidden access error', async () => {
+    const response = await request(app)
+      .put(`/api/products/${productId}`)
+      .set('Cookie', userCookie)
+      .send({ ...product, name: 'Updated product' });
+
+    expect(response.status).toBe(403);
+    expect(response.body.message).toBe('Forbidden access');
+  });
+
   test('PUT /api/products/:id - It should return an error if product id is invalid', async () => {
     const response = await request(app)
       .put('/api/products/123')
-      .set('Cookie', cookie)
+      .set('Cookie', adminCookie)
       .send({ ...product, name: 'Updated product' });
 
     expect(response.status).toBe(400);
@@ -324,7 +350,7 @@ describe('FAIL: Update a product', () => {
   test('PUT /api/products/:id - It should return an error if product is not found', async () => {
     const response = await request(app)
       .put(`/api/products/666666666666666666666666`)
-      .set('Cookie', cookie)
+      .set('Cookie', adminCookie)
       .send({ ...product, name: 'Updated product' });
 
     expect(response.status).toBe(404);
@@ -334,7 +360,7 @@ describe('FAIL: Update a product', () => {
   test('PUT /api/products/:id - It should return an error if `name` is empty', async () => {
     const response = await request(app)
       .put(`/api/products/${productId}`)
-      .set('Cookie', cookie)
+      .set('Cookie', adminCookie)
       .send({ ...product, name: '' });
 
     expect(response.status).toBe(400);
@@ -344,7 +370,7 @@ describe('FAIL: Update a product', () => {
   test('PUT /api/products/:id - It should return an error if `description` is empty', async () => {
     const response = await request(app)
       .put(`/api/products/${productId}`)
-      .set('Cookie', cookie)
+      .set('Cookie', adminCookie)
       .send({ ...product, description: '' });
 
     expect(response.status).toBe(400);
@@ -354,7 +380,7 @@ describe('FAIL: Update a product', () => {
   test('PUT /api/products/:id - It should return an error if `price` is empty', async () => {
     const response = await request(app)
       .put(`/api/products/${productId}`)
-      .set('Cookie', cookie)
+      .set('Cookie', adminCookie)
       .send({ ...product, price: '' });
 
     expect(response.status).toBe(400);
@@ -364,7 +390,7 @@ describe('FAIL: Update a product', () => {
   test('PUT /api/products/:id - It should return an error if `price` is not an integer value', async () => {
     const response = await request(app)
       .put(`/api/products/${productId}`)
-      .set('Cookie', cookie)
+      .set('Cookie', adminCookie)
       .send({ ...product, price: 'ABC' });
 
     expect(response.status).toBe(400);
@@ -374,7 +400,7 @@ describe('FAIL: Update a product', () => {
   test('PUT /api/products/:id - It should return an error if `stock` is empty', async () => {
     const response = await request(app)
       .put(`/api/products/${productId}`)
-      .set('Cookie', cookie)
+      .set('Cookie', adminCookie)
       .send({ ...product, stock: '' });
 
     expect(response.status).toBe(400);
@@ -384,10 +410,8 @@ describe('FAIL: Update a product', () => {
   test('PUT /api/products/:id - It should return an error if `stock` is not an integer value', async () => {
     const response = await request(app)
       .put(`/api/products/${productId}`)
-      .set('Cookie', cookie)
+      .set('Cookie', adminCookie)
       .send({ ...product, stock: 'ABC' });
-
-    console.log(response.body);
 
     expect(response.status).toBe(400);
     expect(response.body.message).toBe('Stock must be an integer value');
@@ -396,7 +420,7 @@ describe('FAIL: Update a product', () => {
   test('PUT /api/products/:id - It should return an error if `images` is empty', async () => {
     const response = await request(app)
       .put(`/api/products/${productId}`)
-      .set('Cookie', cookie)
+      .set('Cookie', adminCookie)
       .send({ ...product, images: [] });
 
     expect(response.status).toBe(400);
@@ -406,7 +430,7 @@ describe('FAIL: Update a product', () => {
   test('PUT /api/products/:id - It should return an error if `category` is empty', async () => {
     const response = await request(app)
       .put(`/api/products/${productId}`)
-      .set('Cookie', cookie)
+      .set('Cookie', adminCookie)
       .send({ ...product, category: '' });
 
     expect(response.status).toBe(400);
@@ -416,7 +440,7 @@ describe('FAIL: Update a product', () => {
   test('PUT /api/products/:id - It should return an error if `category` is invalid', async () => {
     const response = await request(app)
       .put(`/api/products/${productId}`)
-      .set('Cookie', cookie)
+      .set('Cookie', adminCookie)
       .send({ ...product, category: '123' });
 
     expect(response.status).toBe(400);
@@ -426,7 +450,7 @@ describe('FAIL: Update a product', () => {
   test('PUT /api/products/:id - It should return an error if `category` is not found', async () => {
     const response = await request(app)
       .put(`/api/products/${productId}`)
-      .set('Cookie', cookie)
+      .set('Cookie', adminCookie)
       .send({ ...product, category: '666666666666666666666666' });
 
     expect(response.status).toBe(404);
@@ -436,7 +460,7 @@ describe('FAIL: Update a product', () => {
   test('PUT /api/products/:id - It should return an error if `category` is not a valid ObjectId', async () => {
     const response = await request(app)
       .put(`/api/products/${productId}`)
-      .set('Cookie', cookie)
+      .set('Cookie', adminCookie)
       .send({ ...product, category: 'ABC' });
 
     expect(response.status).toBe(400);
@@ -448,7 +472,7 @@ describe('SUCCESS: Delete a product', () => {
   test('DELETE /api/products/:id - It should return a success message', async () => {
     const response = await request(app)
       .delete(`/api/products/${productId}`)
-      .set('Cookie', cookie);
+      .set('Cookie', adminCookie);
 
     expect(response.status).toBe(200);
     expect(response.body.message).toBe(`Product with id ${productId} deleted`);
@@ -463,10 +487,19 @@ describe('FAIL: Delete a product', () => {
     expect(response.body.message).toBe('User not authorized');
   });
 
+  test('DELETE /api/products/:id - It should return a forbidden access error', async () => {
+    const response = await request(app)
+      .delete(`/api/products/${productId}`)
+      .set('Cookie', userCookie);
+
+    expect(response.status).toBe(403);
+    expect(response.body.message).toBe('Forbidden access');
+  });
+
   test('DELETE /api/products/:id - It should return an error if product id is invalid', async () => {
     const response = await request(app)
       .delete('/api/products/123')
-      .set('Cookie', cookie);
+      .set('Cookie', adminCookie);
 
     expect(response.status).toBe(400);
     expect(response.body.message).toBe('Invalid product id');
@@ -475,7 +508,7 @@ describe('FAIL: Delete a product', () => {
   test('DELETE /api/products/:id - It should return an error if product is not found', async () => {
     const response = await request(app)
       .delete(`/api/products/666666666666666666666666`)
-      .set('Cookie', cookie);
+      .set('Cookie', adminCookie);
 
     expect(response.status).toBe(404);
     expect(response.body.message).toBe('Product not found');
