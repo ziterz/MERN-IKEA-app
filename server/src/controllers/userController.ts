@@ -12,6 +12,12 @@ import {
 } from '../interfaces/IRequest';
 import { IUser } from '../interfaces/IUser';
 
+/**
+ * @route   POST api/auth/register
+ * @desc    Register a new user
+ * @access  Public
+ */
+
 export const register: RequestHandler = async (
   req: Request,
   res: Response,
@@ -69,6 +75,12 @@ export const register: RequestHandler = async (
     next(err);
   }
 };
+
+/**
+ * @route   POST api/auth/login
+ * @desc    Login user
+ * @access  Public
+ */
 
 export const login: RequestHandler = async (
   req: Request,

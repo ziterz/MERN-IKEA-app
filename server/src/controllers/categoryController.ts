@@ -1,6 +1,12 @@
 import { RequestHandler, Request, Response, NextFunction } from 'express';
 import { Category } from '../models/Category.model';
 
+/**
+ * @route   POST api/categories
+ * @desc    Add a new category
+ * @access  Private
+ */
+
 export const addCategory: RequestHandler = async (
   req: Request,
   res: Response,
@@ -22,6 +28,12 @@ export const addCategory: RequestHandler = async (
   }
 };
 
+/**
+ * @route   GET api/categories
+ * @desc    Get all categories
+ * @access  Public
+ */
+
 export const getCategories: RequestHandler = async (
   req: Request,
   res: Response,
@@ -35,6 +47,12 @@ export const getCategories: RequestHandler = async (
     next(err);
   }
 };
+
+/**
+ * @route   GET api/categories/:id
+ * @desc    Get category by id
+ * @access  Public
+ */
 
 export const getCategoryById: RequestHandler = async (
   req: Request,
@@ -59,6 +77,12 @@ export const getCategoryById: RequestHandler = async (
     next(err);
   }
 };
+
+/**
+ * @route   PUT api/categories/:id
+ * @desc    Update category by id
+ * @access  Private
+ */
 
 export const updateCategory: RequestHandler = async (
   req: Request,
@@ -91,6 +115,12 @@ export const updateCategory: RequestHandler = async (
     next(err);
   }
 };
+
+/**
+ * @route   DELETE api/categories/:id
+ * @desc    Delete category by id
+ * @access  Private
+ */
 
 export const deleteCategory: RequestHandler = async (
   req: Request,

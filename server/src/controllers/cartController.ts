@@ -6,6 +6,12 @@ import { IProduct } from '../interfaces/IProduct';
 import { ICart } from '../interfaces/ICart';
 import { Order } from '../models/Order.model';
 
+/**
+ * @route   POST api/carts
+ * @desc    Add product to cart
+ * @access  Private
+ */
+
 export const addToCart: RequestHandler = async (
   req: Request,
   res: Response,
@@ -68,6 +74,12 @@ export const addToCart: RequestHandler = async (
   }
 };
 
+/**
+ * @route   GET api/carts
+ * @desc    Get cart by user
+ * @access  Private
+ */
+
 export const getCart: RequestHandler = async (
   req: Request,
   res: Response,
@@ -93,6 +105,12 @@ export const getCart: RequestHandler = async (
   }
 };
 
+/**
+ * @route   PATCH api/carts/:id
+ * @desc    Update cart by user
+ * @access  Private
+ */
+
 export const updateCart: RequestHandler = async (
   req: Request,
   res: Response,
@@ -101,11 +119,22 @@ export const updateCart: RequestHandler = async (
   try {
     const { productId, quantity } = req.body;
 
+    if (!productId.match(/^[0-9a-fA-F]{24}$/)) {
+      throw { name: 'BadRequest', message: 'Invalid product id' };
+    }
+
     const product: IProduct | null = await Product.findById(productId);
 
     if (!product) {
       throw { name: 'NotFound', message: 'Product not found' };
     }
+
+    // check out of stock
+    const checkStock: IProduct | null = await Product.findById(productId)
+      .where('stock')
+      .gt(0);
+
+    if (!checkStock) {
 
     const cart: ICart | null = await Cart.findOne({ user: req.userId });
 
@@ -140,6 +169,12 @@ export const updateCart: RequestHandler = async (
   }
 };
 
+/**
+ * @route   DELETE api/carts/:id
+ * @desc    Update cart product by user
+ * @access  Private
+ */
+
 export const deleteCart: RequestHandler = async (
   req: Request,
   res: Response,
@@ -161,6 +196,12 @@ export const deleteCart: RequestHandler = async (
     next(err);
   }
 };
+
+/**
+ * @route   POST api/carts/checkout
+ * @desc    Checkout cart by user
+ * @access  Private
+ */
 
 export const checkout: RequestHandler = async (
   req: Request,

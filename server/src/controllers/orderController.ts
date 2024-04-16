@@ -1,6 +1,12 @@
 import { RequestHandler, Request, Response, NextFunction } from 'express';
 import { Order } from '../models/Order.model';
 
+/**
+ * @route   GET api/orders
+ * @desc    Get all orders by user
+ * @access  Private
+ */
+
 export const getOrders: RequestHandler = async (
   req: Request,
   res: Response,
@@ -21,6 +27,12 @@ export const getOrders: RequestHandler = async (
     next(err);
   }
 };
+
+/**
+ * @route   GET api/orders/:id
+ * @desc    Get order by id
+ * @access  Private
+ */
 
 export const getOrderById: RequestHandler = async (
   req: Request,

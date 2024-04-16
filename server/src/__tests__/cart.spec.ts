@@ -8,6 +8,7 @@ import { Category } from '../models/Category.model';
 import { Product } from '../models/Product.model';
 import { User } from '../models/User.model';
 import category from '../routes/category';
+import exp from 'constants';
 
 let cookie: string;
 let productId: mongoose.Types.ObjectId | undefined;
@@ -131,4 +132,130 @@ describe('FAIL: Create a new cart', () => {
   });
 });
 
-// TODO: Write the test suite for the getCart controller
+describe('SUCCESS: Get cart by user', () => {
+  test('GET /api/carts - It should return user cart', async () => {
+    const response = await request(app).get('/api/carts').set('Cookie', cookie);
+
+    expect(response.status).toBe(200);
+    expect(response.body).toBeInstanceOf(Object);
+    expect(response.body).toHaveProperty('user', expect.any(String));
+    expect(response.body.items).toBeInstanceOf(Array);
+    expect(response.body.items[0]).toHaveProperty(
+      'product',
+      expect.any(Object)
+    );
+    expect(response.body.items[0].product).toHaveProperty(
+      '_id',
+      expect.any(String)
+    );
+    expect(response.body.items[0].product).toHaveProperty(
+      'name',
+      expect.any(String)
+    );
+    expect(response.body.items[0].product).toHaveProperty(
+      'description',
+      expect.any(String)
+    );
+    expect(response.body.items[0].product).toHaveProperty(
+      'price',
+      expect.any(Number)
+    );
+    expect(response.body.items[0].product).toHaveProperty(
+      'stock',
+      expect.any(Number)
+    );
+    expect(response.body.items[0].product.images).toBeInstanceOf(Array);
+    expect(response.body.items[0].product.images).toContainEqual(
+      expect.any(String)
+    );
+    expect(response.body.items[0]).toHaveProperty(
+      'quantity',
+      expect.any(Number)
+    );
+    expect(response.body.items[0].product.category).toBeInstanceOf(Object);
+    expect(response.body.items[0].product.category).toHaveProperty(
+      '_id',
+      expect.any(String)
+    );
+    expect(response.body.items[0].product.category).toHaveProperty(
+      'name',
+      expect.any(String)
+    );
+    expect(response.body.items[0].product.category).toHaveProperty(
+      'image',
+      expect.any(String)
+    );
+  });
+});
+
+describe('FAIL: Get cart by user', () => {
+  test('GET /api/carts - It should return an unauthorized error', async () => {
+    const response = await request(app).get('/api/carts');
+
+    expect(response.status).toBe(401);
+    expect(response.body.message).toBe('User not authorized');
+  });
+});
+
+describe('SUCCESS: Update cart by user', () => {
+  test('PATCH /api/carts/:id - It should return an updated cart', async () => {
+    const response = await request(app)
+      .patch(`/api/carts`)
+      .set('Cookie', cookie)
+      .send({ productId, quantity: 1 });
+
+    expect(response.status).toBe(200);
+    expect(response.body.message).toBe('Cart updated successfully');
+  });
+});
+
+describe('FAIL: Update cart by user', () => {
+  test('PATCH /api/carts/:id - It should return an unauthorized error', async () => {
+    const response = await request(app)
+      .patch(`/api/carts`)
+      .send({ productId, quantity: 1 });
+
+    expect(response.status).toBe(401);
+    expect(response.body.message).toBe('User not authorized');
+  });
+
+  test('PATCH /api/carts/:id - It should return an invalid id format if empty', async () => {
+    const response = await request(app)
+      .patch(`/api/carts`)
+      .set('Cookie', cookie)
+      .send({ productId: '', quantity: 1 });
+
+    expect(response.status).toBe(400);
+    expect(response.body.message).toBe('Invalid product id');
+  });
+
+  test('PATCH /api/carts/:id - It should return an invalid id format', async () => {
+    const response = await request(app)
+      .patch(`/api/carts`)
+      .set('Cookie', cookie)
+      .send({ productId: '123', quantity: 1 });
+
+    expect(response.status).toBe(400);
+    expect(response.body.message).toBe('Invalid product id');
+  });
+
+  test('PATCH /api/carts/:id - It should return a product not found', async () => {
+    const response = await request(app)
+      .patch(`/api/carts`)
+      .set('Cookie', cookie)
+      .send({ productId: '666666666666666666666666', quantity: 1 });
+
+    expect(response.status).toBe(404);
+    expect(response.body.message).toBe('Product not found');
+  });
+
+  test('PATCH /api/carts/:id - It should return a product is out of stock', async () => {
+    const response = await request(app)
+      .patch(`/api/carts`)
+      .set('Cookie', cookie)
+      .send({ productId: emptyStockProductId, quantity: 1 });
+
+    expect(response.status).toBe(400);
+    expect(response.body.message).toBe('Product is out of stock');
+  });
+});
