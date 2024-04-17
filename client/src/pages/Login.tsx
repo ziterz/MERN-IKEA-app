@@ -1,7 +1,7 @@
 import { useForm, SubmitHandler } from "react-hook-form";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import Header from "../components/Header";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import * as apiClient from "../api-client";
 
 export type LoginFormData = {
@@ -10,6 +10,7 @@ export type LoginFormData = {
 };
 
 const Login = () => {
+  const queryClient = useQueryClient();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -21,7 +22,8 @@ const Login = () => {
 
   const mutation = useMutation({
     mutationFn: apiClient.login,
-    onSuccess: () => {
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["validateToken"] });
       navigate(location.state?.from?.pathname || "/");
     },
   });
@@ -45,7 +47,7 @@ const Login = () => {
                 </div>
               </div>
               <div>
-                <div className="flex justify-center align-middle">
+                <div className="justify-left flex align-middle">
                   <div className="w-3/5">
                     <form onSubmit={handleSubmit(onSubmit)}>
                       <div className="mb-6">

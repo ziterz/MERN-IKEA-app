@@ -1,5 +1,5 @@
 import { useForm, SubmitHandler } from "react-hook-form";
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import Header from "../components/Header";
 import { useMutation } from "@tanstack/react-query";
 import * as apiClient from "../api-client";
@@ -230,7 +230,7 @@ const Register = () => {
                       </div>
                       <div className="mb-6">
                         <label htmlFor="confirmPassword" className="text-sm">
-                          Repeat your confirmPassword
+                          Repeat your password
                           <span className="float-right text-lg text-red-600">
                             *
                           </span>
