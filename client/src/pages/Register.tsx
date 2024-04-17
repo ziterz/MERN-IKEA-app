@@ -1,6 +1,6 @@
 import Header from "../components/Header";
 
-const Auth = () => {
+const Register = () => {
   return (
     <>
       <Header />
@@ -160,4 +160,4 @@ const Auth = () => {
   );
 };
 
-export default Auth;
+export default Register;

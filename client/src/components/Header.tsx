@@ -51,11 +51,11 @@ const Header = () => {
             <a href="#" className="absolute hidden lg:block">
               <span className="material-symbols-outlined -ms-12">menu</span>
             </a>
-            <Link to={"/"} className="p-2">
+            <Link to={`/`} className="p-2">
               <img src={Logo} alt="IKEA Logo" className="h-16 w-20 md:w-24" />
             </Link>
             <div className="ml-12 mr-4 hidden flex-grow  rounded-full  bg-gray-100 focus-within:bg-white focus-within:ring-2 focus-within:ring-sky-700 md:block">
-              <form id="search">
+              <form>
                 <div className="relative py-2">
                   <div className="absolute inset-y-0 left-0 flex cursor-pointer items-center pl-6 pr-4">
                     <span className="material-symbols-outlined">search</span>
@@ -84,7 +84,7 @@ const Header = () => {
               </div>
               <div className="ml-2 py-2">
                 <Link
-                  to={"/login"}
+                  to={`/login`}
                   className="block h-10 w-10 text-center hover:rounded-full hover:bg-gray-100"
                 >
                   <span className="material-symbols-outlined leading-10">
@@ -103,14 +103,14 @@ const Header = () => {
                 </a>
               </div>
               <div className="ml-2 py-2">
-                <a
-                  href="#"
+                <Link
+                  to={`/shopping-cart`}
                   className="block h-10 w-10 text-center hover:rounded-full hover:bg-gray-100"
                 >
                   <span className="material-symbols-outlined leading-10">
                     shopping_basket
                   </span>
-                </a>
+                </Link>
               </div>
               <div className="ml-2 py-2 lg:hidden">
                 <a
