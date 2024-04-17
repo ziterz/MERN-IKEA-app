@@ -20,7 +20,7 @@ const Login = () => {
   } = useForm<LoginFormData>();
 
   const mutation = useMutation({
-    mutationFn: apiClient.loginUser,
+    mutationFn: apiClient.login,
     onSuccess: () => {
       navigate(location.state?.from?.pathname || "/");
     },

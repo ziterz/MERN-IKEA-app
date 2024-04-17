@@ -1,6 +1,42 @@
+import { useForm, SubmitHandler } from "react-hook-form";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import Header from "../components/Header";
+import { useMutation } from "@tanstack/react-query";
+import * as apiClient from "../api-client";
+
+export type RegisterFormData = {
+  firstName: string;
+  lastName: string;
+  phoneNumber: string;
+  address: string;
+  postalCode: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+};
 
 const Register = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors },
+  } = useForm<RegisterFormData>();
+
+  const mutation = useMutation({
+    mutationFn: apiClient.register,
+    onSuccess: () => {
+      navigate(location.state?.from?.pathname || "/login");
+    },
+  });
+
+  const onSubmit: SubmitHandler<RegisterFormData> = (data) => {
+    mutation.mutate(data);
+  };
+
   return (
     <>
       <Header />
@@ -19,7 +55,7 @@ const Register = () => {
               <div>
                 <div className="justify-left flex align-middle">
                   <div className="w-2/3">
-                    <form>
+                    <form onSubmit={handleSubmit(onSubmit)}>
                       <div className="mb-4">
                         <label htmlFor="phoneNumber" className="text-sm">
                           Phone number
@@ -29,11 +65,22 @@ const Register = () => {
                         </label>
                         <input
                           type="tel"
-                          name="phoneNumber"
                           id="phoneNumber"
                           className="w-full rounded border border-gray-400 px-5 py-3 text-sm"
                           placeholder="e.g: 081234567890"
+                          {...register("phoneNumber", {
+                            required: "Phone Number is required",
+                            pattern: {
+                              value: /^08(\d{3,4}-?){2}\d{3,4}$/,
+                              message: "Invalid phone number",
+                            },
+                          })}
                         />
+                        {errors.phoneNumber && (
+                          <span className="text-sm text-red-500">
+                            {errors.phoneNumber.message}
+                          </span>
+                        )}
                       </div>
                       <div className="mb-4">
                         <label htmlFor="email" className="text-sm">
@@ -44,11 +91,23 @@ const Register = () => {
                         </label>
                         <input
                           type="email"
-                          name="email"
                           id="email"
                           className="w-full rounded border border-gray-400 px-5 py-3 text-sm"
                           placeholder="e.g: example@mail.com"
+                          {...register("email", {
+                            required: "Email is required",
+                            pattern: {
+                              value:
+                                /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+                              message: "Invalid email address",
+                            },
+                          })}
                         />
+                        {errors.email && (
+                          <span className="text-sm text-red-500">
+                            {errors.email.message}
+                          </span>
+                        )}
                       </div>
                       <div className="mb-4">
                         <label htmlFor="firstName" className="text-sm">
@@ -59,11 +118,18 @@ const Register = () => {
                         </label>
                         <input
                           type="text"
-                          name="firstName"
                           id="firstName"
                           className="w-full rounded border border-gray-400 px-5 py-3 text-sm"
                           placeholder="Enter your first name ..."
+                          {...register("firstName", {
+                            required: "First Name is required",
+                          })}
                         />
+                        {errors.firstName && (
+                          <span className="text-sm text-red-500">
+                            {errors.firstName.message}
+                          </span>
+                        )}
                       </div>
                       <div className="mb-4">
                         <label htmlFor="lastName" className="text-sm">
@@ -74,11 +140,18 @@ const Register = () => {
                         </label>
                         <input
                           type="text"
-                          name="lastName"
                           id="lastName"
                           className="w-full rounded border border-gray-400 px-5 py-3 text-sm"
                           placeholder="Enter your last name ..."
+                          {...register("lastName", {
+                            required: "Last Name is required",
+                          })}
                         />
+                        {errors.lastName && (
+                          <span className="text-sm text-red-500">
+                            {errors.lastName.message}
+                          </span>
+                        )}
                       </div>
                       <div className="mb-4">
                         <label htmlFor="address" className="text-sm">
@@ -89,11 +162,18 @@ const Register = () => {
                         </label>
                         <input
                           type="text"
-                          name="address"
                           id="address"
                           className="w-full rounded border border-gray-400 px-5 py-3 text-sm"
                           placeholder="Enter your address for delivery ..."
+                          {...register("address", {
+                            required: "Address is required",
+                          })}
                         />
+                        {errors.address && (
+                          <span className="text-sm text-red-500">
+                            {errors.address.message}
+                          </span>
+                        )}
                       </div>
                       <div className="mb-4">
                         <label htmlFor="postalCode" className="text-sm">
@@ -104,11 +184,22 @@ const Register = () => {
                         </label>
                         <input
                           type="text"
-                          name="postalCode"
                           id="postalCode"
                           className="w-full rounded border border-gray-400 px-5 py-3 text-sm"
                           placeholder="Enter your postal code number ..."
+                          {...register("postalCode", {
+                            required: "Postal Code is required",
+                            pattern: {
+                              value: /^\d{5}$/,
+                              message: "Invalid postal code",
+                            },
+                          })}
                         />
+                        {errors.postalCode && (
+                          <span className="text-sm text-red-500">
+                            {errors.postalCode.message}
+                          </span>
+                        )}
                       </div>
                       <div className="mb-4">
                         <label htmlFor="password" className="text-sm">
@@ -119,11 +210,23 @@ const Register = () => {
                         </label>
                         <input
                           type="password"
-                          name="password"
                           id="password"
                           className="w-full rounded border border-gray-400 px-5 py-3 text-sm"
                           placeholder="Enter your password ..."
+                          {...register("password", {
+                            required: "Password is required",
+                            minLength: {
+                              value: 5,
+                              message:
+                                "Password must have at least 5 characters",
+                            },
+                          })}
                         />
+                        {errors.password && (
+                          <span className="text-sm text-red-500">
+                            {errors.password.message}
+                          </span>
+                        )}
                       </div>
                       <div className="mb-6">
                         <label htmlFor="confirmPassword" className="text-sm">
@@ -134,11 +237,21 @@ const Register = () => {
                         </label>
                         <input
                           type="password"
-                          name="confirmPassword"
                           id="confirmPassword"
                           className="w-full rounded border border-gray-400 px-5 py-3 text-sm"
                           placeholder="Repeat your password ..."
+                          {...register("confirmPassword", {
+                            required: "Confirm Password is required",
+                            validate: (value) =>
+                              value === watch("password") ||
+                              "The passwords do not match",
+                          })}
                         />
+                        {errors.confirmPassword && (
+                          <span className="text-sm text-red-500">
+                            {errors.confirmPassword.message}
+                          </span>
+                        )}
                       </div>
                       <div className="mb-4">
                         <button
