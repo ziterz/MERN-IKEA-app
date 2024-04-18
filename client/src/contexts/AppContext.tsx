@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import { createContext } from "react";
 import { useQuery } from "@tanstack/react-query";
 import * as apiClient from "../api-client";
 
@@ -6,7 +6,7 @@ type AppContext = {
   isLoggedIn: boolean;
 };
 
-const AppContext = React.createContext<AppContext | undefined>(undefined);
+export const AppContext = createContext<AppContext | undefined>(undefined);
 
 export const AppContextProvider = ({
   children,
@@ -28,9 +28,4 @@ export const AppContextProvider = ({
       {children}
     </AppContext.Provider>
   );
-};
-
-export const useAppContext = () => {
-  const context = useContext(AppContext);
-  return context as AppContext;
 };

@@ -1,6 +1,8 @@
 import Card from "../components/Card";
 import { useState } from "react";
 import Header from "../components/Header";
+import { useQuery } from "@tanstack/react-query";
+import * as apiClient from "../api-client";
 
 const Home = () => {
   const [products] = useState([
@@ -46,6 +48,11 @@ const Home = () => {
       ],
     },
   ]);
+
+  const { data } = useQuery({
+    queryKey: ["fetchCategories"],
+    queryFn: apiClient.fetchCategories,
+  });
 
   return (
     <>
@@ -101,84 +108,22 @@ const Home = () => {
               <div className="text-center">
                 <h2 className="mb-14 text-3xl font-bold">Top Category Picks</h2>
                 <div className="grid grid-cols-2 gap-6 md:grid-cols-3 lg:grid-cols-6">
-                  <a
-                    href="#"
-                    className="mx-auto w-3/4 rounded-lg hover:shadow-2xl lg:w-full"
-                  >
-                    <img
-                      className="mb-5 rounded-lg"
-                      src="https://d2xjmi1k71iy2m.cloudfront.net/dairyfarm/id/range/icons/1675665821_range.jpg"
-                      alt="Non upholstered chairs"
-                    />
-                    <span className="flex min-h-11 items-center justify-center text-base">
-                      Non upholstered chairs
-                    </span>
-                  </a>
-                  <a
-                    href="#"
-                    className="mx-auto w-3/4 rounded-lg hover:shadow-2xl lg:w-full"
-                  >
-                    <img
-                      className="mb-5 rounded-lg"
-                      src="https://d2xjmi1k71iy2m.cloudfront.net/dairyfarm/id/range/icons/1675665875_range.jpg"
-                      alt="Chest of drawers"
-                    />
-                    <span className="flex min-h-11 items-center justify-center text-base">
-                      Chest of drawers
-                    </span>
-                  </a>
-                  <a
-                    href="#"
-                    className="mx-auto w-3/4 rounded-lg hover:shadow-2xl lg:w-full"
-                  >
-                    <img
-                      className="mb-5 rounded-lg"
-                      src="https://d2xjmi1k71iy2m.cloudfront.net/dairyfarm/id/range/icons/1675670627_range.jpg"
-                      alt="Cushions"
-                    />
-                    <span className="flex min-h-11 items-center justify-center text-base">
-                      Cushions
-                    </span>
-                  </a>
-                  <a
-                    href="#"
-                    className="mx-auto w-3/4 rounded-lg hover:shadow-2xl lg:w-full"
-                  >
-                    <img
-                      className="mb-5 rounded-lg"
-                      src="https://d2xjmi1k71iy2m.cloudfront.net/dairyfarm/id/range/icons/1705024744_range.jpg"
-                      alt="Sofas"
-                    />
-                    <span className="flex min-h-11 items-center justify-center text-base">
-                      Sofas
-                    </span>
-                  </a>
-                  <a
-                    href="#"
-                    className="mx-auto w-3/4 rounded-lg hover:shadow-2xl lg:w-full"
-                  >
-                    <img
-                      className="mb-5 rounded-lg"
-                      src="https://d2xjmi1k71iy2m.cloudfront.net/dairyfarm/id/range/icons/1675665757_range.jpg"
-                      alt="Home desks"
-                    />
-                    <span className="flex min-h-11 items-center justify-center text-base">
-                      Home desks
-                    </span>
-                  </a>
-                  <a
-                    href="#"
-                    className="mx-auto w-3/4 rounded-lg hover:shadow-2xl lg:w-full"
-                  >
-                    <img
-                      className="mb-5 rounded-lg"
-                      src="https://d2xjmi1k71iy2m.cloudfront.net/dairyfarm/id/range/icons/1675666203_range.jpg"
-                      alt="Mattresses"
-                    />
-                    <span className="flex min-h-11 items-center justify-center text-base">
-                      Mattresses
-                    </span>
-                  </a>
+                  {data?.categories.map((category) => (
+                    <a
+                      key={category._id}
+                      href="#"
+                      className="mx-auto w-3/4 rounded-lg hover:shadow-2xl lg:w-full"
+                    >
+                      <img
+                        className="mb-5 rounded-lg"
+                        src={category.image}
+                        alt={category.name}
+                      />
+                      <span className="flex min-h-11 items-center justify-center text-base">
+                        {category.name}
+                      </span>
+                    </a>
+                  ))}
                 </div>
               </div>
             </div>

@@ -4,14 +4,15 @@ import {
   Routes,
   Navigate,
 } from "react-router-dom";
-import { useAppContext } from "./contexts/AppContext";
+import { useContext } from "react";
+import { AppContext } from "./contexts/AppContext";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import ShoppingCart from "./pages/ShoppingCart";
 
 const App = () => {
-  const { isLoggedIn } = useAppContext();
+  const context = useContext(AppContext);
 
   return (
     <Router>
@@ -19,7 +20,7 @@ const App = () => {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        {isLoggedIn && (
+        {context?.isLoggedIn && (
           <Route path="/shopping-cart" element={<ShoppingCart />} />
         )}
         <Route path="*" element={<Navigate to="/login" />} />

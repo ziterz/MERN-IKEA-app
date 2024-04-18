@@ -46,3 +46,23 @@ export const validateToken = async () => {
 
   return response.json();
 };
+
+type CategoryType = {
+  _id: string;
+  name: string;
+  image: string;
+};
+
+type CategoryResponseType = {
+  categories: CategoryType[];
+};
+
+export const fetchCategories = async (): Promise<CategoryResponseType> => {
+  const response = await fetch(`${API_BASE_URL}/api/categories`);
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch categories");
+  }
+
+  return response.json();
+};
