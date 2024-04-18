@@ -2,9 +2,9 @@ import { beforeAll, afterAll, describe, test, expect } from '@jest/globals';
 import mongoose from 'mongoose';
 import request from 'supertest';
 import app from '../app';
-import { Category } from '../models/Category.model';
-import { Product } from '../models/Product.model';
-import { User } from '../models/User.model';
+import Category from '../models/Category/Category.model';
+import Product from '../models/Product/Product.model';
+import User from '../models/User/User.model';
 import { productSeeder } from '../seeders/product.seeder';
 import { userSeeder } from '../seeders/user.seeder';
 

@@ -1,6 +1,6 @@
 import { RequestHandler, Request, Response, NextFunction } from 'express';
 import jwt, { JwtPayload } from 'jsonwebtoken';
-import { User } from '../models/User.model';
+import User from '../models/User/User.model';
 import { verifyToken } from '../utils/jwt';
 
 declare global {

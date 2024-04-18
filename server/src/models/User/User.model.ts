@@ -1,8 +1,8 @@
 import { Schema, model } from 'mongoose';
-import { hashPassword } from '../utils/bcrypt';
-import { IUser } from '../interfaces/IUser';
+import { hashPassword } from '../../utils/bcrypt';
+import UserDocument from './User';
 
-const UserSchema = new Schema<IUser>({
+const UserSchema = new Schema<UserDocument>({
   firstName: {
     type: String,
     required: [true, 'First Name is a required field'],
@@ -49,10 +49,11 @@ const UserSchema = new Schema<IUser>({
   },
 });
 
-UserSchema.pre<IUser>('save', async function (next) {
+UserSchema.pre<UserDocument>('save', async function (next) {
   this.password = await hashPassword(this.password);
 
   return next();
 });
 
-export const User = model<IUser>('User', UserSchema);
+const User = model<UserDocument>('User', UserSchema);
+export default User;

@@ -1,5 +1,5 @@
 import { RequestHandler, Request, Response, NextFunction } from 'express';
-import { Category } from '../models/Category.model';
+import Category from '../models/Category/Category.model';
 
 /**
  * @route   POST api/categories

@@ -1,7 +1,7 @@
 import { Schema, model } from 'mongoose';
-import { IProduct } from '../interfaces/IProduct';
+import ProductDocument from './Product';
 
-const ProductSchema = new Schema<IProduct>({
+const ProductSchema = new Schema<ProductDocument>({
   name: { type: String, required: [true, 'Name is a required field'] },
   description: {
     type: String,
@@ -23,7 +23,6 @@ const ProductSchema = new Schema<IProduct>({
     type: [String],
     minlength: 2,
     required: [true, 'Images is a required field'],
-    // minimum 2 images
     validate: {
       validator: function (images: string[]) {
         return images.length >= 2;
@@ -35,14 +34,8 @@ const ProductSchema = new Schema<IProduct>({
     type: Schema.Types.ObjectId,
     required: [true, 'Category is a required field'],
     ref: 'Category',
-    validate: {
-      validator: function (category: string) {
-        const objIdRegex = /^[0-9a-fA-F]{24}$/;
-        return objIdRegex.test(category);
-      },
-      message: 'Category must be a valid ObjectId',
-    },
   },
 });
 
-export const Product = model<IProduct>('Product', ProductSchema);
+const Product = model<ProductDocument>('Product', ProductSchema);
+export default Product;

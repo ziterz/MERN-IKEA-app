@@ -1,16 +1,7 @@
 import { RequestHandler, Request, Response, NextFunction } from 'express';
 import { comparePassword } from '../utils/bcrypt';
 import { generateToken } from '../utils/jwt';
-import { User } from '../models/User.model';
-import {
-  IUserLoginResponse,
-  IUserRegisterResponse,
-} from '../interfaces/IResponse';
-import {
-  IUserLoginRequest,
-  IUserRegisterRequest,
-} from '../interfaces/IRequest';
-import { IUser } from '../interfaces/IUser';
+import User from '../models/User/User.model';
 
 /**
  * @route   POST api/auth/register
@@ -34,9 +25,9 @@ export const register: RequestHandler = async (
       password,
       confirmPassword,
       role,
-    } = req.body as IUserRegisterRequest;
+    } = req.body;
 
-    const findUser: IUser | null = await User.findOne({
+    const findUser = await User.findOne({
       email,
     });
 
@@ -48,7 +39,7 @@ export const register: RequestHandler = async (
       throw { name: 'BadRequest', message: 'Passwords do not match' };
     }
 
-    const user: IUser | null = await User.create({
+    const user = await User.create({
       firstName,
       lastName,
       address,
@@ -70,7 +61,7 @@ export const register: RequestHandler = async (
         email: user.email,
         role: user.role,
       },
-    } as IUserRegisterResponse);
+    });
   } catch (err: any) {
     next(err);
   }
@@ -88,9 +79,9 @@ export const login: RequestHandler = async (
   next: NextFunction
 ) => {
   try {
-    const { email, password } = req.body as IUserLoginRequest;
+    const { email, password } = req.body;
 
-    const user: IUser | null = await User.findOne({ email });
+    const user = await User.findOne({ email });
 
     if (!user) {
       throw { name: 'BadRequest', message: 'Invalid email or password' };
@@ -122,7 +113,27 @@ export const login: RequestHandler = async (
         email: user.email,
         role: user.role,
       },
-    } as IUserLoginResponse);
+    });
+  } catch (err: any) {
+    next(err);
+  }
+};
+
+/**
+ * @route   POST api/auth/validate-token
+ * @desc    Validate token
+ * @access  Public
+ */
+
+export const validateToken: RequestHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    res.status(200).json({
+      message: 'Token is valid',
+    });
   } catch (err: any) {
     next(err);
   }

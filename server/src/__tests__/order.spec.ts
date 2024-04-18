@@ -11,11 +11,11 @@ import request from 'supertest';
 import app from '../app';
 import { productSeeder } from '../seeders/product.seeder';
 import { userSeeder } from '../seeders/user.seeder';
-import { Category } from '../models/Category.model';
-import { Product } from '../models/Product.model';
-import { User } from '../models/User.model';
-import { Cart } from '../models/Cart.model';
-import { Order } from '../models/Order.model';
+import Category from '../models/Category/Category.model';
+import Product from '../models/Product/Product.model';
+import User from '../models/User/User.model';
+import Cart from '../models/Cart/Cart.model';
+import Order from '../models/Order/Order.model';
 
 let adminCookie: string;
 let userCookie: string;

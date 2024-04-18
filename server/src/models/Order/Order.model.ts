@@ -1,7 +1,7 @@
 import { Schema, model } from 'mongoose';
-import { IOrder } from '../interfaces/IOrder';
+import OrderDocument from './Order';
 
-const OrderSchema = new Schema<IOrder>({
+const OrderSchema = new Schema<OrderDocument>({
   user: {
     type: Schema.Types.ObjectId,
     required: true,
@@ -22,4 +22,5 @@ const OrderSchema = new Schema<IOrder>({
   createdAt: { type: Date, required: true },
 });
 
-export const Order = model<IOrder>('Order', OrderSchema);
+const Order = model<OrderDocument>('Order', OrderSchema);
+export default Order;

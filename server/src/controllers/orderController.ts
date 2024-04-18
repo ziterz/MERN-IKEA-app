@@ -1,5 +1,5 @@
 import { RequestHandler, Request, Response, NextFunction } from 'express';
-import { Order } from '../models/Order.model';
+import Order from '../models/Order/Order.model';
 
 /**
  * @route   GET api/orders

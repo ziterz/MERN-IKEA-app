@@ -1,6 +1,6 @@
 import { RequestHandler, Request, Response, NextFunction } from 'express';
-import { Product } from '../models/Product.model';
-import { Category } from '../models/Category.model';
+import Product from '../models/Product/Product.model';
+import Category from '../models/Category/Category.model';
 
 /**
  * @route   POST api/products

@@ -1,10 +1,8 @@
 import { RequestHandler, Request, Response, NextFunction } from 'express';
-import { Product } from '../models/Product.model';
-import { Cart } from '../models/Cart.model';
-import { User } from '../models/User.model';
-import { IProduct } from '../interfaces/IProduct';
-import { ICart } from '../interfaces/ICart';
-import { Order } from '../models/Order.model';
+import Product from '../models/Product/Product.model';
+import Cart from '../models/Cart/Cart.model';
+import User from '../models/User/User.model';
+import Order from '../models/Order/Order.model';
 
 /**
  * @route   POST api/carts
@@ -24,21 +22,19 @@ export const addToCart: RequestHandler = async (
       throw { name: 'BadRequest', message: 'Invalid product id' };
     }
 
-    const product: IProduct | null = await Product.findById(productId);
+    const product = await Product.findById(productId);
 
     if (!product) {
       throw { name: 'NotFound', message: 'Product not found' };
     }
 
-    const checkStock: IProduct | null = await Product.findById(productId)
-      .where('stock')
-      .gt(0);
+    const checkStock = await Product.findById(productId).where('stock').gt(0);
 
     if (!checkStock) {
       throw { name: 'BadRequest', message: 'Product is out of stock' };
     }
 
-    const cart: ICart | null = await Cart.findOne({ user: req.userId });
+    const cart = await Cart.findOne({ user: req.userId });
 
     if (!cart) {
       await Cart.create({
@@ -86,7 +82,7 @@ export const getCart: RequestHandler = async (
   next: NextFunction
 ) => {
   try {
-    const cart: ICart | null = await Cart.findOne({
+    const cart = await Cart.findOne({
       user: req.userId,
     }).populate({
       path: 'items.product',
@@ -123,21 +119,19 @@ export const updateCart: RequestHandler = async (
       throw { name: 'BadRequest', message: 'Invalid product id' };
     }
 
-    const product: IProduct | null = await Product.findById(productId);
+    const product = await Product.findById(productId);
 
     if (!product) {
       throw { name: 'NotFound', message: 'Product not found' };
     }
 
-    const checkStock: IProduct | null = await Product.findById(productId)
-      .where('stock')
-      .gt(0);
+    const checkStock = await Product.findById(productId).where('stock').gt(0);
 
     if (!checkStock) {
       throw { name: 'BadRequest', message: 'Product is out of stock' };
     }
 
-    const cart: ICart | null = await Cart.findOne({ user: req.userId });
+    const cart = await Cart.findOne({ user: req.userId });
 
     if (!cart) {
       throw { name: 'NotFound', message: 'Cart not found' };
@@ -182,7 +176,7 @@ export const deleteCart: RequestHandler = async (
   next: NextFunction
 ) => {
   try {
-    const cart: ICart | null = await Cart.findOne({ user: req.userId });
+    const cart = await Cart.findOne({ user: req.userId });
 
     if (!cart) {
       throw { name: 'NotFound', message: 'Cart not found' };
@@ -213,13 +207,13 @@ export const checkout: RequestHandler = async (
   session.startTransaction();
 
   try {
-    const user: any = await User.findById(req.userId);
+    const user = await User.findById(req.userId);
 
     if (!user) {
       throw { name: 'NotFound', message: 'User not found' };
     }
 
-    const cart: ICart | null = await Cart.findOne({
+    const cart = await Cart.findOne({
       user: req.userId,
     }).populate('items.product');
 
@@ -236,7 +230,7 @@ export const checkout: RequestHandler = async (
         await Cart.updateOne(
           { user: req.userId },
           {
-            $pull: { items: { product: product._id } },
+            $pull: { items: { product } },
           }
         );
 
@@ -247,7 +241,7 @@ export const checkout: RequestHandler = async (
       }
 
       await Product.updateOne(
-        { _id: product._id },
+        { product },
         {
           $inc: { stock: -cart.items[i].quantity },
         }

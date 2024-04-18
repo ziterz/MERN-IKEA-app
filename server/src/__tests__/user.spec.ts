@@ -2,7 +2,7 @@ import { beforeAll, afterAll, describe, test, expect } from '@jest/globals';
 import mongoose from 'mongoose';
 import request from 'supertest';
 import app from '../app';
-import { User } from '../models/User.model';
+import User from '../models/User/User.model';
 import { userSeeder } from '../seeders/user.seeder';
 
 const user = {

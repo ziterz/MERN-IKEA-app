@@ -1,5 +1,5 @@
-import { Category } from '../models/Category.model';
-import { Product } from '../models/Product.model';
+import Category from '../models/Category/Category.model';
+import Product from '../models/Product/Product.model';
 
 export const productSeeder = async () => {
   const categories = [
@@ -32,36 +32,6 @@ export const productSeeder = async () => {
       name: 'Home textiles',
       image:
         'https://www.ikea.com/global/assets/range-categorisation/images/bath-textiles-tl003.jpeg?imwidth=400',
-    },
-    {
-      name: 'Home décor',
-      image:
-        'https://www.ikea.com/global/assets/range-categorisation/images/home-fragrance-42926.jpeg?imwidth=400',
-    },
-    {
-      name: 'Kitchenware & tableware',
-      image:
-        'https://www.ikea.com/us/en/range-categorisation/images/dinnerware-18860.jpeg?imwidth=400',
-    },
-    {
-      name: 'Kitchenware & tableware',
-      image:
-        'https://www.ikea.com/us/en/range-categorisation/images/dinnerware-18860.jpeg?imwidth=400',
-    },
-    {
-      name: 'Baby & kids',
-      image:
-        'https://www.ikea.com/global/assets/range-categorisation/images/children-bc003.jpeg?imwidth=400',
-    },
-    {
-      name: 'Laundry & cleaning',
-      image:
-        'https://www.ikea.com/global/assets/range-categorisation/images/laundry-cabinets-shelving-48925.jpeg?imwidth=400',
-    },
-    {
-      name: 'Bathroom',
-      image:
-        'https://www.ikea.com/global/assets/range-categorisation/images/bathroom-systems-700450.jpeg?imwidth=400',
     },
   ];
 
