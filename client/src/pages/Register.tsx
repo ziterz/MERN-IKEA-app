@@ -1,6 +1,5 @@
 import { useForm, SubmitHandler } from "react-hook-form";
 import { useNavigate, useLocation } from "react-router-dom";
-import Header from "../components/Header";
 import { useMutation } from "@tanstack/react-query";
 import * as apiClient from "../api-client";
 
@@ -39,7 +38,6 @@ const Register = () => {
 
   return (
     <>
-      <Header />
       <main>
         <section id="carousel">
           <div className="container m-auto">

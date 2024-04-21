@@ -1,9 +1,6 @@
-import Header from "../components/Header";
-
 const ShoppingCart = () => {
   return (
     <>
-      <Header />
       <main>
         <section id="carousel">
           <div className="container m-auto">

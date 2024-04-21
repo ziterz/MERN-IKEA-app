@@ -1,6 +1,5 @@
 import Card from "../components/Card";
 import { useState } from "react";
-import Header from "../components/Header";
 import { useQuery } from "@tanstack/react-query";
 import * as apiClient from "../api-client";
 
@@ -56,7 +55,6 @@ const Home = () => {
 
   return (
     <>
-      <Header />
       <main>
         <section
           id="controls-carousel"
